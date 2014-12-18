@@ -206,7 +206,7 @@ class ApiClient(object):
         """
 
         return self.post(
-            action=self.ACTION_MESSAGE_SYSTEM_PUBLISH,
+            action=self.ACTION_MESSAGE_PUBLISH,
             params={
                 "fromUserId": from_user_id,
                 "toUserId": to_user_id,
