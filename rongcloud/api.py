@@ -78,10 +78,10 @@ class ApiClient(object):
         ).hexdigest()
 
         return {
-            "app-key": self.app_key,
-            "nonce": nonce,
-            "timestamp": timestamp,
-            "signature": signature
+            "rc-app-key": self.app_key,
+            "rc-nonce": nonce,
+            "rc-timestamp": timestamp,
+            "rc-signature": signature
         }
 
     def headers(self):
