@@ -3,6 +3,7 @@
 
 import os
 import json
+import time
 import logging
 import random
 import datetime
@@ -24,15 +25,25 @@ class ApiClient(object):
                  (library_details, __version__)
 
     ACTION_USER_TOKEN = "/user/getToken"
-    ACTION_MESSAGE_PUBLISH = "/message/publish"
+    ACTION_USER_REFRESH = "/user/refresh"
+    ACTION_USER_CHECKONLINE = "/user/checkOnline"
+    ACTION_USER_BLOCK = '/user/block'
+    ACTION_USER_UNBLOCK = '/user/unblock'
+    ACTION_USER_BLOCK_QUERY = '/user/block/query'
+
+    ACTION_MESSAGE_PUBLISH = "/message/private/publish"
     ACTION_MESSAGE_SYSTEM_PUBLISH = "/message/system/publish"
     ACTION_MESSAGE_GROUP_PUBLISH = "/message/group/publish"
     ACTION_MESSAGE_CHATROOM_PUBLISH = "/message/chatroom/publish"
+    ACTION_MESSAGE_HISTORY = '/message/history'
+
     ACTION_GROUP_SYNC = "/group/sync"
     ACTION_GROUP_CREATE = "/group/create"
     ACTION_GROUP_JOIN = "/group/join"
     ACTION_GROUP_QUIT = "/group/quit"
     ACTION_GROUP_DISMISS = "/group/dismiss"
+    ACTION_GROUP_REFRESH = "/group/refresh"
+
     ACTION_CHATROOM_CREATE = "/chatroom/create"
     ACTION_CHATROOM_DESTROY = "/chatroom/destroy"
     ACTION_CHATROOM_QUERY = "/chatroom/query"
@@ -70,7 +81,7 @@ class ApiClient(object):
 
         nonce = str(random.random())
         timestamp = str(
-            int(datetime.datetime.now().strftime("%s")) * 1000
+            int(time.time()) * 1000
         )
 
         signature = hashlib.sha1(
@@ -188,6 +199,46 @@ class ApiClient(object):
             }
         )
 
+    def user_refresh(self, user_id, name, portrait_uri):
+        return self.post(
+            action=self.ACTION_USER_REFRESH,
+            params={
+                "userId": user_id,
+                "name": name,
+                "portraitUri": portrait_uri
+            }
+        )
+
+    def user_check_online(self, user_id):
+        return self.post(
+            action=self.ACTION_USER_CHECKONLINE,
+            params={
+                "userId": user_id
+            }
+        )
+
+    def user_block(self, user_id, minute):
+        return self.post(
+            action=self.ACTION_USER_BLOCK,
+            params={
+                "userId": user_id,
+                "minute": minute
+            }
+        )
+
+    def user_unblock(self, user_id):
+        return self.post(
+            action=self.ACTION_USER_UNBLOCK,
+            params={
+                "userId": user_id
+            }
+        )
+
+    def user_block_query(self):
+        return self.post(
+            action=self.ACTION_USER_BLOCK_QUERY
+        )
+
     def message_publish(self, from_user_id, to_user_id,
                         object_name, content,
                         push_content=None, push_data=None):
@@ -274,41 +325,25 @@ class ApiClient(object):
                                  to_chatroom_id,
                                  object_name,
                                  content):
-
-        """一个用户向聊天室发送消息
-        http://docs.rongcloud.cn/server.html#_发送聊天室消息_方法
-
-        :param from_user_id:发送人用户 Id。（必传）
-        :param to_chatroom_id:接收聊天室Id，提供多个本参数可以实现向多个聊天室发送消息。（必传）
-        :param object_name:消息类型，参考融云消息类型表.消息标志；可自定义消息类型。（必传）
-        :param content:发送消息内容，参考融云消息类型表.示例说明；如果 objectName 为自定义消息类型，该参数可自定义格式。（必传）
-        :return:{"code":200}
-        """
-
         return self.post(
-            action=self.ACTION_MESSAGE_GROUP_PUBLISH,
+            action=self.ACTION_MESSAGE_CHATROOM_PUBLISH,
             params={
                 "fromUserId": from_user_id,
-                "toGroupId": to_chatroom_id,
+                "toChatroomId": to_chatroom_id,
                 "objectName": object_name,
                 "content": content
             }
         )
 
+    def message_history(self, date):
+        return self.post(
+            action=self.ACTION_MESSAGE_HISTORY,
+            params={
+                "date": date,
+            }
+        )
+
     def group_sync(self, user_id, groups):
-
-        """同步用户所属群组
-        融云当前群组的架构设计决定，您不需要调用融云服务器去“创建”群组
-        也就是告诉融云服务器哪些群组有哪些用户。
-        您只需要同步当前用户所属的群组信息给融云服务器
-        即相当于“订阅”或者“取消订阅”了所属群组的消息。
-        融云会根据用户同步的群组数据，计算群组的成员信息并群发消息。
-
-        :param user_id:用户Id
-        :param groups: groupId 和 groupName 的对应关系.例如：{10001:'group1',10002:'group2'}
-        :return:{"code":200}
-        """
-
         group_mapping = {"group[%s]" % k:v for k, v in groups.items()}
         group_mapping.setdefault("userId", user_id)
 
@@ -316,15 +351,6 @@ class ApiClient(object):
 
     def group_create(self, user_id_list, group_id, group_name):
 
-        """创建群组，并将用户加入该群组，用户将可以收到该群的消息。
-        注：其实本方法是加入群组方法 /group/join 的别名。
-        http://docs.rongcloud.cn/server.html#_创建群组_方法
-
-        :param user_id_list:要加入群的用户 Id ，可以传递多个值:[userid1,userid2]
-        :param group_id:要加入的群 Id。
-        :param group_name:要加入的群 Id 对应的名称。
-        :return:{"code":200}
-        """
         return self.post(action=self.ACTION_GROUP_CREATE, params={
             "userId":user_id_list,
             "groupId":group_id,
@@ -332,20 +358,16 @@ class ApiClient(object):
         })
 
     def group_join(self, user_id_list, group_id, group_name):
-
-        """将用户加入指定群组，用户将可以收到该群的消息
-        http://docs.rongcloud.cn/server.html#_加入群组_方法
-
-
-        :param user_id_list:要加入群的用户 [userid1,userid2 ...]
-        :param group_id:要加入的群 Id。
-        :param group_name:要加入的群 Id 对应的名称。
-        :return:{"code":200}
-        """
         return self.post(action=self.ACTION_GROUP_JOIN, params={
             "userId":user_id_list,
             "groupId":group_id,
             "groupName":group_name
+        })
+
+    def group_quit(self, user_id_list, group_id):
+        return self.post(action=self.ACTION_GROUP_QUIT, params={
+            "userId": user_id_list,
+            "groupId": group_id
         })
 
     def group_dismiss(self, user_id, group_id):
@@ -361,6 +383,13 @@ class ApiClient(object):
         return self.post(action=self.ACTION_GROUP_DISMISS, params={
             "userId":user_id,
             "groupId":group_id,
+        })
+
+    def group_refresh(self, group_id, group_name):
+        return self.post(action=self.ACTION_GROUP_REFRESH, params={
+            "groupId": group_id,
+            "groupName": group_name
+
         })
 
     def chatroom_create(self, chatrooms):
