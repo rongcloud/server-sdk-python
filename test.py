@@ -1,13 +1,25 @@
 #! /usr/bin/env python
 # coding=utf-8
 
+import os
 import json
-from test_helper import unittest
-from test_helper import client
+import unittest
+import logging
+
+from rong import ApiClient
+
+app_key = "xxxx"
+app_secret = "xxx"
+
+os.environ.setdefault('rongcloud-app-key', app_key)
+os.environ.setdefault('rongcloud-app-secret', app_secret)
+
+logging.basicConfig(level=logging.INFO)
+
+client = ApiClient()
 
 
 class ApiTest(unittest.TestCase):
-
     def test_token_get(self):
         result = client.user_get_token(
             'test-userid1',
@@ -58,6 +70,21 @@ class ApiTest(unittest.TestCase):
         block_user_list = client.user_block_query()
         self.assertEqual(block_user_list[u'code'], 200)
         self.assertTrue('test-userid2' not in [r.get("userId") for r in block_user_list.get("users")], "检查解封是否成功")
+
+    def test_user_blocklist_add(self):
+        result = client.user_blocklist_add('test-userid1', ['test-userid2', 'test-userid3'])
+        self.assertEqual(result[u'code'], 200)
+
+    def test_user_blocklist_query(self):
+        result = client.user_blocklist_query('test-userid1')
+        self.assertTrue('test-userid2' in result.get('users'))
+        self.assertTrue('test-userid3' in result.get('users'))
+
+    def test_user_blocklist_remove(self):
+        client.user_blocklist_remove('test-userid1', ['test-userid2', 'test-userid3'])
+        result = client.user_blocklist_query('test-userid1')
+        self.assertTrue('test-userid2' not in result.get('users'))
+        self.assertTrue('test-userid3' not in result.get('users'))
 
     def test_message_publish(self):
         result = client.message_publish(
@@ -171,6 +198,7 @@ class ApiTest(unittest.TestCase):
         result = client.chatroom_destroy(
             chatroom_id_list=["tr001", "tr002"]
         )
+        self.assertEqual(result[u'code'], 200)
 
 if __name__ == "__main__":
     unittest.main()

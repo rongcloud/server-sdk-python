@@ -2,27 +2,116 @@
 # coding=utf-8
 
 import os
+import re
 import json
 import time
 import logging
 import random
 import datetime
 import hashlib
-import platform
-
 import requests
 
-import util
-import exceptions
-from version import __version__
+
+class ConnectionError(Exception):
+    def __init__(self, response, content=None, message=None):
+        self.response = response
+        self.content = content
+        self.message = message
+
+    def __str__(self):
+        message = "Failed."
+        if hasattr(self.response, 'status_code'):
+            message += " Response status: %s." % (self.response.status_code)
+        if hasattr(self.response, 'reason'):
+            message += " Response message: %s." % (self.response.reason)
+        if self.content is not None:
+            message += " Error message: " + str(self.content)
+        return message
+
+
+class Redirection(ConnectionError):
+    """3xx Redirection
+    """
+    def __str__(self):
+        message = super(Redirection, self).__str__()
+        if self.response.get('Location'):
+            message = "%s => %s" % (message, self.response.get('Location'))
+        return message
+
+
+class MissingParam(TypeError):
+    pass
+
+
+class MissingConfig(Exception):
+    pass
+
+
+class ClientError(ConnectionError):
+    """4xx Client Error
+    """
+    pass
+
+
+class BadRequest(ClientError):
+    """400 Bad Request
+    """
+    pass
+
+
+class UnauthorizedAccess(ClientError):
+    """401 Unauthorized
+    """
+    pass
+
+
+class ForbiddenAccess(ClientError):
+    """403 Forbidden
+    """
+    pass
+
+
+class ResourceNotFound(ClientError):
+    """404 Not Found
+    """
+    pass
+
+
+class ResourceConflict(ClientError):
+    """409 Conflict
+    """
+    pass
+
+
+class ResourceGone(ClientError):
+    """410 Gone
+    """
+    pass
+
+
+class ResourceInvalid(ClientError):
+    """422 Invalid
+    """
+    pass
+
+
+class ServerError(ConnectionError):
+    """5xx Server Error
+    """
+    pass
+
+
+class MethodNotAllowed(ClientError):
+    """405 Method Not Allowed
+    """
+
+    def allowed_methods(self):
+        return self.response['Allow']
 
 
 class ApiClient(object):
     api_host = "https://api.cn.rong.io"
     response_type = "json"
-    library_details = "python %s" % platform.python_version()
-    user_agent = "RongCloudSdk/RongCloud-Python-Sdk %s (%s)" % \
-                 (library_details, __version__)
 
     ACTION_USER_TOKEN = "/user/getToken"
     ACTION_USER_REFRESH = "/user/refresh"
@@ -30,6 +119,10 @@ class ApiClient(object):
     ACTION_USER_BLOCK = '/user/block'
     ACTION_USER_UNBLOCK = '/user/unblock'
     ACTION_USER_BLOCK_QUERY = '/user/block/query'
+
+    ACTION_USER_BLACKLIST_ADD = "/user/blacklist/add"
+    ACTION_USER_BLACKLIST_REMOVE = "/user/blacklist/remove"
+    ACTION_USER_BLACKLIST_QUERY = "/user/blacklist/query"
 
     ACTION_MESSAGE_PUBLISH = "/message/private/publish"
     ACTION_MESSAGE_SYSTEM_PUBLISH = "/message/system/publish"
@@ -48,30 +141,61 @@ class ApiClient(object):
     ACTION_CHATROOM_DESTROY = "/chatroom/destroy"
     ACTION_CHATROOM_QUERY = "/chatroom/query"
 
+    def __init__(self, key=None, secret=None):
+        self._app_key = key
+        self._app_secret = secret
 
-    def __init__(self, app_key=None, app_secret=None, verify=True):
+        if self._app_key is None:
+            self._app_key = os.environ.get('rongcloud-app-key')
+        if self._app_secret is None:
+            self._app_secret = os.environ.get('rongcloud-app-secret')
 
-        """ API 客户端
-        Usage::
-            >>> from rongcloud.api import ApiClient
-            >>> client = ApiClient('xxxxx', 'xxxx')
+    @staticmethod
+    def _merge_dict(data, *override):
+        result = {}
+        for current_dict in (data,) + override:
+            result.update(current_dict)
+        return result
 
-            建议您将APPKEY, APPSECRET 保存在系统的环境变量中
-            环境变量的键值分别为：rongcloud-app-key， rongcloud-app-secret
+    @staticmethod
+    def _join_url(url, *paths):
+        for path in paths:
+            url = re.sub(r'/?$', re.sub(r'^/?', '/', path), url)
+        return url
 
-            >>> from rongcloud.api import ApiClient
-            >>> client = ApiClient()
-
-        :param app_key: 开发者平台分配的 App Key
-        :param app_secret: 开发者平台分配的 App Secret。
-        :param verify: 发送请求时是否验证SSL证书的有效性
+    @staticmethod
+    def _handle_response(response, content):
+        """Validate HTTP response
         """
+        status = response.status_code
+        if status in (301, 302, 303, 307):
+            raise Redirection(response, content)
+        elif 200 <= status <= 299:
+            return json.loads(content) if content else {}
+        elif status == 400:
+            raise BadRequest(response, content)
+        elif status == 401:
+            raise UnauthorizedAccess(response, content)
+        elif status == 403:
+            raise ForbiddenAccess(response, content)
+        elif status == 404:
+            raise ResourceNotFound(response, content)
+        elif status == 405:
+            raise MethodNotAllowed(response, content)
+        elif status == 409:
+            raise ResourceConflict(response, content)
+        elif status == 410:
+            raise ResourceGone(response, content)
+        elif status == 422:
+            raise ResourceInvalid(response, content)
+        elif 401 <= status <= 499:
+            raise ClientError(response, content)
+        elif 500 <= status <= 599:
+            raise ServerError(response, content)
+        else:
+            raise ConnectionError(response, content, "Unknown response code: #{response.code}")
 
-        self.app_key = app_key or os.environ.get('rongcloud-app-key')
-        self.app_secret = app_secret or os.environ.get('rongcloud-app-secret')
-        self.verify = verify
-
-    def make_common_signature(self):
+    def _make_common_signature(self):
 
         """生成通用签名
         一般情况下，您不需要调用该方法
@@ -85,28 +209,27 @@ class ApiClient(object):
         )
 
         signature = hashlib.sha1(
-            self.app_secret + nonce + timestamp
+            self._app_secret + nonce + timestamp
         ).hexdigest()
 
         return {
-            "rc-app-key": self.app_key,
+            "rc-app-key": self._app_key,
             "rc-nonce": nonce,
             "rc-timestamp": timestamp,
             "rc-signature": signature
         }
 
-    def headers(self):
+    def _headers(self):
         """Default HTTP headers
         """
-        return util.merge_dict(
-            self.make_common_signature(),
+        return self._merge_dict(
+            self._make_common_signature(),
             {
                 "content-type": "application/x-www-form-urlencoded",
-                "user-agent": self.user_agent
             }
         )
 
-    def http_call(self, url, method, **kwargs):
+    def _http_call(self, url, method, **kwargs):
         """Makes a http call. Logs response information.
         """
         logging.info("Request[%s]: %s" % (method, url))
@@ -114,7 +237,6 @@ class ApiClient(object):
 
         response = requests.request(method,
                                     url,
-                                    verify=self.verify,
                                     **kwargs)
 
         duration = datetime.datetime.now() - start_time
@@ -122,61 +244,29 @@ class ApiClient(object):
                      (response.status_code, response.reason,
                       duration.seconds, duration.microseconds))
 
-        return self.handle_response(response,
+        return self._handle_response(response,
                                     response.content.decode("utf-8"))
 
-    def handle_response(self, response, content):
-        """Validate HTTP response
+    def call_api(self, action, params=None, **kwargs):
         """
-        status = response.status_code
-        if status in (301, 302, 303, 307):
-            raise exceptions.Redirection(response, content)
-        elif 200 <= status <= 299:
-            return json.loads(content) if content else {}
-        elif status == 400:
-            raise exceptions.BadRequest(response, content)
-        elif status == 401:
-            raise exceptions.UnauthorizedAccess(response, content)
-        elif status == 403:
-            raise exceptions.ForbiddenAccess(response, content)
-        elif status == 404:
-            raise exceptions.ResourceNotFound(response, content)
-        elif status == 405:
-            raise exceptions.MethodNotAllowed(response, content)
-        elif status == 409:
-            raise exceptions.ResourceConflict(response, content)
-        elif status == 410:
-            raise exceptions.ResourceGone(response, content)
-        elif status == 422:
-            raise exceptions.ResourceInvalid(response, content)
-        elif 401 <= status <= 499:
-            raise exceptions.ClientError(response, content)
-        elif 500 <= status <= 599:
-            raise exceptions.ServerError(response, content)
-        else:
-            raise exceptions.ConnectionError(response, content, "Unknown response code: #{response.code}")
+        调用API的通用方法，有关SSL证书验证问题请参阅
 
-    def post(self, action, params=None):
+        http://www.python-requests.org/en/latest/user/advanced/#ssl-cert-verification
 
-        """POST 应用参数到接口地址
-        所有http请求由此处理，方法内部封装统一的签名规则及 API URL
-        当有新的接口推出，而SDK未更新时，您可用该方法
+        :param action: Method Name，
+        :param params: Dictionary,form params for api.
+        :param timeout: (optional) Float describing the timeout of the request.
+        :param verify: (optional) if ``True``, the SSL cert will be verified. A CA_BUNDLE path can also be provided
+        :param cert: (optional) if String, path to ssl client cert file (.pem). If Tuple, ('cert', 'key') pair.
 
-        Usage::
-            >>> from rongcloud.api import ApiClient
-            >>> client = ApiClient()
-            >>> client.post('/user/getToken', {})
-
-        :param action: 接口地址，例如：/message/chatroom/publish
-        :param params: 应用级别参数，{"fromUserId":"xxxx", "content":"xxxxx"}
-        :return: {"code":200, "userId":"jlk456j5", "token":"sfd9823ihufi"}
-
+        :return:
         """
-        return self.http_call(
-            url=util.join_url(self.api_host, "%s.%s" % (action, self.response_type)),
+        return self._http_call(
+            url=self._join_url(self.api_host, "%s.%s" % (action, self.response_type)),
             method="POST",
             data=params,
-            headers=self.headers()
+            headers=self._headers(),
+            **kwargs
         )
 
     def user_get_token(self, user_id, name, portrait_uri):
@@ -190,7 +280,7 @@ class ApiClient(object):
         :return: {"code":200, "userId":"jlk456j5", "token":"sfd9823ihufi"}
 
         """
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_TOKEN,
             params={
                 "userId": user_id,
@@ -200,7 +290,7 @@ class ApiClient(object):
         )
 
     def user_refresh(self, user_id, name, portrait_uri):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_REFRESH,
             params={
                 "userId": user_id,
@@ -210,7 +300,7 @@ class ApiClient(object):
         )
 
     def user_check_online(self, user_id):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_CHECKONLINE,
             params={
                 "userId": user_id
@@ -218,7 +308,7 @@ class ApiClient(object):
         )
 
     def user_block(self, user_id, minute):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_BLOCK,
             params={
                 "userId": user_id,
@@ -227,7 +317,7 @@ class ApiClient(object):
         )
 
     def user_unblock(self, user_id):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_UNBLOCK,
             params={
                 "userId": user_id
@@ -235,8 +325,34 @@ class ApiClient(object):
         )
 
     def user_block_query(self):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_USER_BLOCK_QUERY
+        )
+
+    def user_blocklist_add(self, user_id, black_user_id):
+        return self.call_api(
+            action=self.ACTION_USER_BLACKLIST_ADD,
+            params={
+                'userId':user_id,
+                'blackUserId':black_user_id
+            }
+        )
+
+    def user_blocklist_remove(self, user_id, black_user_id):
+        return self.call_api(
+            action=self.ACTION_USER_BLACKLIST_REMOVE,
+            params={
+                'userId':user_id,
+                'blackUserId':black_user_id
+            }
+        )
+
+    def user_blocklist_query(self, user_id):
+        return self.call_api(
+            action=self.ACTION_USER_BLACKLIST_QUERY,
+            params={
+                'userId':user_id,
+            }
         )
 
     def message_publish(self, from_user_id, to_user_id,
@@ -256,7 +372,7 @@ class ApiClient(object):
         :return:{"code":200}
         """
 
-        return self.post(
+        return self.call_api(
             action=self.ACTION_MESSAGE_PUBLISH,
             params={
                 "fromUserId": from_user_id,
@@ -283,7 +399,7 @@ class ApiClient(object):
         :param push_data:针对 iOS 平台，Push 通知附加的 payload 字段，字段名为 appData。(可选)
         :return:{"code":200}
         """
-        return self.post(
+        return self.call_api(
             action=self.ACTION_MESSAGE_SYSTEM_PUBLISH,
             params={
                 "fromUserId": from_user_id,
@@ -309,7 +425,7 @@ class ApiClient(object):
         :param push_data:针对 iOS 平台，Push 通知附加的 payload 字段，字段名为 appData。(可选)
         :return:{"code":200}
         """
-        return self.post(
+        return self.call_api(
             action=self.ACTION_MESSAGE_GROUP_PUBLISH,
             params={
                 "fromUserId": from_user_id,
@@ -325,7 +441,7 @@ class ApiClient(object):
                                  to_chatroom_id,
                                  object_name,
                                  content):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_MESSAGE_CHATROOM_PUBLISH,
             params={
                 "fromUserId": from_user_id,
@@ -336,7 +452,7 @@ class ApiClient(object):
         )
 
     def message_history(self, date):
-        return self.post(
+        return self.call_api(
             action=self.ACTION_MESSAGE_HISTORY,
             params={
                 "date": date,
@@ -347,25 +463,25 @@ class ApiClient(object):
         group_mapping = {"group[%s]" % k:v for k, v in groups.items()}
         group_mapping.setdefault("userId", user_id)
 
-        return self.post(action=self.ACTION_GROUP_SYNC, params=group_mapping)
+        return self.call_api(action=self.ACTION_GROUP_SYNC, params=group_mapping)
 
     def group_create(self, user_id_list, group_id, group_name):
 
-        return self.post(action=self.ACTION_GROUP_CREATE, params={
+        return self.call_api(action=self.ACTION_GROUP_CREATE, params={
             "userId":user_id_list,
             "groupId":group_id,
             "groupName":group_name
         })
 
     def group_join(self, user_id_list, group_id, group_name):
-        return self.post(action=self.ACTION_GROUP_JOIN, params={
+        return self.call_api(action=self.ACTION_GROUP_JOIN, params={
             "userId":user_id_list,
             "groupId":group_id,
             "groupName":group_name
         })
 
     def group_quit(self, user_id_list, group_id):
-        return self.post(action=self.ACTION_GROUP_QUIT, params={
+        return self.call_api(action=self.ACTION_GROUP_QUIT, params={
             "userId": user_id_list,
             "groupId": group_id
         })
@@ -380,13 +496,13 @@ class ApiClient(object):
         :param group_id:要解散的群 Id。
         :return:{"code":200}
         """
-        return self.post(action=self.ACTION_GROUP_DISMISS, params={
+        return self.call_api(action=self.ACTION_GROUP_DISMISS, params={
             "userId":user_id,
             "groupId":group_id,
         })
 
     def group_refresh(self, group_id, group_name):
-        return self.post(action=self.ACTION_GROUP_REFRESH, params={
+        return self.call_api(action=self.ACTION_GROUP_REFRESH, params={
             "groupId": group_id,
             "groupName": group_name
 
@@ -400,7 +516,7 @@ class ApiClient(object):
         :return:{"code":200}
         """
         chatroom_mapping = {'chatroom[%s]' % k:v for k, v in chatrooms.items()}
-        return self.post(action=self.ACTION_CHATROOM_CREATE, params=chatroom_mapping)
+        return self.call_api(action=self.ACTION_CHATROOM_CREATE, params=chatroom_mapping)
 
     def chatroom_destroy(self, chatroom_id_list=None):
 
@@ -416,7 +532,7 @@ class ApiClient(object):
             "chatroomId":chatroom_id_list
         } if chatroom_id_list is not None else {}
 
-        return self.post(action=self.ACTION_CHATROOM_DESTROY, params=params)
+        return self.call_api(action=self.ACTION_CHATROOM_DESTROY, params=params)
 
     def chatroom_query(self, chatroom_id_list=None):
 
@@ -432,4 +548,4 @@ class ApiClient(object):
             "chatroomId":chatroom_id_list
         } if chatroom_id_list is not None else {}
 
-        return self.post(action=self.ACTION_CHATROOM_QUERY, params=params)
+        return self.call_api(action=self.ACTION_CHATROOM_QUERY, params=params)
