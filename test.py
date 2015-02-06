@@ -8,11 +8,11 @@ import logging
 
 from rong import ApiClient
 
-app_key = "xxxx"
-app_secret = "xxx"
+#app_key = ""
+#app_secret = ""
 
-os.environ.setdefault('rongcloud-app-key', app_key)
-os.environ.setdefault('rongcloud-app-secret', app_secret)
+#os.environ.setdefault('rongcloud_app_key', app_key)
+#os.environ.setdefault('rongcloud_app_secret', app_secret)
 
 logging.basicConfig(level=logging.INFO)
 

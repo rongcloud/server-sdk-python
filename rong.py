@@ -146,9 +146,9 @@ class ApiClient(object):
         self._app_secret = secret
 
         if self._app_key is None:
-            self._app_key = os.environ.get('rongcloud-app-key')
+            self._app_key = os.environ.get('rongcloud_app_key')
         if self._app_secret is None:
-            self._app_secret = os.environ.get('rongcloud-app-secret')
+            self._app_secret = os.environ.get('rongcloud_app_secret')
 
     @staticmethod
     def _merge_dict(data, *override):
@@ -237,6 +237,7 @@ class ApiClient(object):
 
         response = requests.request(method,
                                     url,
+                                    verify=False,
                                     **kwargs)
 
         duration = datetime.datetime.now() - start_time
@@ -256,9 +257,6 @@ class ApiClient(object):
         :param action: Method Name，
         :param params: Dictionary,form params for api.
         :param timeout: (optional) Float describing the timeout of the request.
-        :param verify: (optional) if ``True``, the SSL cert will be verified. A CA_BUNDLE path can also be provided
-        :param cert: (optional) if String, path to ssl client cert file (.pem). If Tuple, ('cert', 'key') pair.
-
         :return:
         """
         return self._http_call(

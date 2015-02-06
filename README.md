@@ -2,10 +2,16 @@ server-sdk-python
 =================
 
 Rong Cloud Server SDK in Python.
+
+# 更新说明
+
+* 20150206
+* 去掉可能会导致SSL验证失败的代码
+* 更改环境变量名称，老的环境变量名称在某些操作系统中无法被识别
+
+
 # 依赖说明
 * 本sdk 依赖于requests
-* 如果您在使用中遇到SSL相关问题，请参阅 [官方文档](http://www.python-requests.org/en/latest/user/advanced/#ssl-cert-verification)
-
 
 # 使用说明
 
@@ -21,8 +27,8 @@ app_key = ""
 app_secret = ""
 
 #您应该将key 和 secret 保存在服务器的环境变量中    
-os.environ.setdefault('rongcloud-app-key', app_key)
-os.environ.setdefault('rongcloud-app-secret', app_secret)
+os.environ.setdefault('rongcloud_app_key', app_key)
+os.environ.setdefault('rongcloud_app_secret', app_secret)
     
 logging.basicConfig(level=logging.INFO)
     
