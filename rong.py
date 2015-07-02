@@ -140,6 +140,7 @@ class ApiClient(object):
     ACTION_CHATROOM_CREATE = "/chatroom/create"
     ACTION_CHATROOM_DESTROY = "/chatroom/destroy"
     ACTION_CHATROOM_QUERY = "/chatroom/query"
+    ACTION_CHATROOM_USER_QUERY = "/chatroom/user/query"
 
     def __init__(self, key=None, secret=None):
         self._app_key = key
@@ -547,3 +548,16 @@ class ApiClient(object):
         } if chatroom_id_list is not None else {}
 
         return self.call_api(action=self.ACTION_CHATROOM_QUERY, params=params)
+
+    def chatroom_user_query(self, chatroom_id):
+
+        """查询聊天室内用户 方法
+
+        http://docs.rongcloud.cn/server.html#_查询聊天室内用户_方法
+
+        :param chatroom_id:要查询的聊天室id
+        :return:{"code":200,"users":[{"id":"uid1"},{"id":"uid2"}]}
+        """
+        return self.call_api(action=self.ACTION_CHATROOM_USER_QUERY, params={
+            "chatroomId": chatroom_id
+        })
