@@ -371,16 +371,22 @@ class ApiClient(object):
         :return:{"code":200}
         """
 
+
+        params = [
+            ("fromUserId", from_user_id),
+            ("objectName", object_name),
+            ("content", content),
+            ("pushContent", push_content if push_content is not None else ""),
+            ("pushData", push_data if push_data is not None else "")
+        ]
+        if not isinstance(to_user_id, list):
+            to_user_id = [to_user_id]
+
+        for user in to_user_id:
+            params.append(("toUserId", user))
         return self.call_api(
             action=self.ACTION_MESSAGE_PUBLISH,
-            params={
-                "fromUserId": from_user_id,
-                "toUserId": to_user_id,
-                "objectName": object_name,
-                "content": content,
-                "pushContent": push_content if push_content is not None else "",
-                "pushData": push_data if push_data is not None else ""
-            }
+            params=params
         )
 
     def message_system_publish(self, from_user_id, to_user_id,
