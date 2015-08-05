@@ -7,8 +7,9 @@ import json
 import time
 import logging
 import random
-import datetime
 import hashlib
+
+import datetime
 import requests
 
 
@@ -32,6 +33,7 @@ class ConnectionError(Exception):
 class Redirection(ConnectionError):
     """3xx Redirection
     """
+
     def __str__(self):
         message = super(Redirection, self).__str__()
         if self.response.get('Location'):
@@ -247,7 +249,7 @@ class ApiClient(object):
                       duration.seconds, duration.microseconds))
 
         return self._handle_response(response,
-                                    response.content.decode("utf-8"))
+                                     response.content.decode("utf-8"))
 
     def call_api(self, action, params=None, **kwargs):
         """
@@ -332,8 +334,8 @@ class ApiClient(object):
         return self.call_api(
             action=self.ACTION_USER_BLACKLIST_ADD,
             params={
-                'userId':user_id,
-                'blackUserId':black_user_id
+                'userId': user_id,
+                'blackUserId': black_user_id
             }
         )
 
@@ -341,8 +343,8 @@ class ApiClient(object):
         return self.call_api(
             action=self.ACTION_USER_BLACKLIST_REMOVE,
             params={
-                'userId':user_id,
-                'blackUserId':black_user_id
+                'userId': user_id,
+                'blackUserId': black_user_id
             }
         )
 
@@ -350,7 +352,7 @@ class ApiClient(object):
         return self.call_api(
             action=self.ACTION_USER_BLACKLIST_QUERY,
             params={
-                'userId':user_id,
+                'userId': user_id,
             }
         )
 
@@ -370,8 +372,6 @@ class ApiClient(object):
         :param push_data:针对 iOS 平台，Push 通知附加的 payload 字段，字段名为 appData。(可选)
         :return:{"code":200}
         """
-
-
         params = [
             ("fromUserId", from_user_id),
             ("objectName", object_name),
@@ -392,7 +392,6 @@ class ApiClient(object):
     def message_system_publish(self, from_user_id, to_user_id,
                                object_name, content,
                                push_content=None, push_data=None):
-
         """发送系统消息
         http://docs.rongcloud.cn/server.html#_发送系统消息_方法
 
@@ -404,21 +403,22 @@ class ApiClient(object):
         :param push_data:针对 iOS 平台，Push 通知附加的 payload 字段，字段名为 appData。(可选)
         :return:{"code":200}
         """
-        return self.call_api(
-            action=self.ACTION_MESSAGE_SYSTEM_PUBLISH,
-            params={
-                "fromUserId": from_user_id,
-                "toUserId": to_user_id,
-                "objectName": object_name,
-                "content": content,
-                "pushContent": push_content if push_content is not None else '',
-                "pushData": push_data if push_data is not None else ''
-            }
-        )
+        params = [
+            ("fromUserId", from_user_id),
+            ("objectName", object_name),
+            ("content", content),
+            ("pushContent", push_content if push_content is not None else ''),
+            ("pushData", push_data if push_data is not None else '')
+        ]
+        if not isinstance(to_user_id, list):
+            to_user_id = [to_user_id]
+        for user in to_user_id:
+            params.append(("toUserId", user))
+
+        return self.call_api(action=self.ACTION_MESSAGE_SYSTEM_PUBLISH, params=params)
 
     def message_group_publish(self, from_user_id, to_group_id, object_name,
                               content, push_content=None, push_data=None):
-
         """以一个用户身份向群组发送消息
         http://docs.rongcloud.cn/server.html#_发送群组消息_方法
 
@@ -430,16 +430,21 @@ class ApiClient(object):
         :param push_data:针对 iOS 平台，Push 通知附加的 payload 字段，字段名为 appData。(可选)
         :return:{"code":200}
         """
+        params = [
+            ("fromUserId", from_user_id),
+            ("objectName", object_name),
+            ("content", content),
+            ("pushContent", push_content if push_content is not None else ''),
+            ("pushData", push_data if push_data is not None else '')
+        ]
+        if not isinstance(to_group_id, list):
+            to_group_id = [to_group_id]
+        for group in to_group_id:
+            params.append(("toGroupId", group))
+
         return self.call_api(
             action=self.ACTION_MESSAGE_GROUP_PUBLISH,
-            params={
-                "fromUserId": from_user_id,
-                "toGroupId": to_group_id,
-                "objectName": object_name,
-                "content": content,
-                "pushContent": push_content if push_content is not None else '',
-                "pushData": push_data if push_data is not None else ''
-            }
+            params=params
         )
 
     def message_chatroom_publish(self, from_user_id,
@@ -465,24 +470,23 @@ class ApiClient(object):
         )
 
     def group_sync(self, user_id, groups):
-        group_mapping = {"group[%s]" % k:v for k, v in groups.items()}
+        group_mapping = {"group[%s]" % k: v for k, v in groups.items()}
         group_mapping.setdefault("userId", user_id)
 
         return self.call_api(action=self.ACTION_GROUP_SYNC, params=group_mapping)
 
     def group_create(self, user_id_list, group_id, group_name):
-
         return self.call_api(action=self.ACTION_GROUP_CREATE, params={
-            "userId":user_id_list,
-            "groupId":group_id,
-            "groupName":group_name
+            "userId": user_id_list,
+            "groupId": group_id,
+            "groupName": group_name
         })
 
     def group_join(self, user_id_list, group_id, group_name):
         return self.call_api(action=self.ACTION_GROUP_JOIN, params={
-            "userId":user_id_list,
-            "groupId":group_id,
-            "groupName":group_name
+            "userId": user_id_list,
+            "groupId": group_id,
+            "groupName": group_name
         })
 
     def group_quit(self, user_id_list, group_id):
@@ -492,7 +496,6 @@ class ApiClient(object):
         })
 
     def group_dismiss(self, user_id, group_id):
-
         """将该群解散，所有用户都无法再接收该群的消息。
         http://docs.rongcloud.cn/server.html#_解散群组_方法
 
@@ -502,8 +505,8 @@ class ApiClient(object):
         :return:{"code":200}
         """
         return self.call_api(action=self.ACTION_GROUP_DISMISS, params={
-            "userId":user_id,
-            "groupId":group_id,
+            "userId": user_id,
+            "groupId": group_id,
         })
 
     def group_refresh(self, group_id, group_name):
@@ -514,17 +517,15 @@ class ApiClient(object):
         })
 
     def chatroom_create(self, chatrooms):
-
         """创建聊天室 方法
         http://docs.rongcloud.cn/server.html#_创建聊天室_方法
         :param chatrooms: {'r001':'room1'} id:要创建的聊天室的id；name:要创建的聊天室的name
         :return:{"code":200}
         """
-        chatroom_mapping = {'chatroom[%s]' % k:v for k, v in chatrooms.items()}
+        chatroom_mapping = {'chatroom[%s]' % k: v for k, v in chatrooms.items()}
         return self.call_api(action=self.ACTION_CHATROOM_CREATE, params=chatroom_mapping)
 
     def chatroom_destroy(self, chatroom_id_list=None):
-
         """销毁聊天室 方法
         当提交参数chatroomId多个时表示销毁多个聊天室
 
@@ -533,14 +534,13 @@ class ApiClient(object):
         :return:{"code":200}
 
         """
-        params={
-            "chatroomId":chatroom_id_list
+        params = {
+            "chatroomId": chatroom_id_list
         } if chatroom_id_list is not None else {}
 
         return self.call_api(action=self.ACTION_CHATROOM_DESTROY, params=params)
 
     def chatroom_query(self, chatroom_id_list=None):
-
         """查询聊天室信息 方法
 
         http://docs.rongcloud.cn/server.html#_查询聊天室信息_方法
@@ -549,14 +549,13 @@ class ApiClient(object):
         :return:{"code":200,"chatRooms":[{"chatroomId":"id1001","name":"name1","time":"2014-01-01 1:1:1"},{"chatroomId":"id1002","name":"name2","time":"2014-01-01 1:1:2"}]}
         """
 
-        params={
-            "chatroomId":chatroom_id_list
+        params = {
+            "chatroomId": chatroom_id_list
         } if chatroom_id_list is not None else {}
 
         return self.call_api(action=self.ACTION_CHATROOM_QUERY, params=params)
 
     def chatroom_user_query(self, chatroom_id):
-
         """查询聊天室内用户 方法
 
         http://docs.rongcloud.cn/server.html#_查询聊天室内用户_方法
@@ -567,3 +566,4 @@ class ApiClient(object):
         return self.call_api(action=self.ACTION_CHATROOM_USER_QUERY, params={
             "chatroomId": chatroom_id
         })
+
