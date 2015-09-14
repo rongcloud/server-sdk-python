@@ -212,7 +212,7 @@ class ApiClient(object):
         )
 
         signature = hashlib.sha1(
-            self._app_secret + nonce + timestamp
+            self._app_secret.encode('utf8') + nonce.encode('utf8') + timestamp.encode('utf8')
         ).hexdigest()
 
         return {
