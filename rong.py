@@ -68,7 +68,11 @@ class ApiClientBase(object):
         return response
 
     def _filter_params(self, params):
-        return {k: v for k, v in params.items() if v is not None}
+        _r = dict()
+        for k, v in params.items():
+            if v is not None:
+                _r[k] = v
+        return _r
 
     def call_api(self, action, params=None, **kwargs):
         """
