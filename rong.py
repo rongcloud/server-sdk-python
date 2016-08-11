@@ -10,6 +10,8 @@ import hashlib
 import datetime
 import requests
 
+Version = 'v2.0'
+
 
 class ApiClientBase(object):
     api_host = "http://api.cn.ronghub.com"
@@ -709,10 +711,10 @@ class ApiClient(ApiClientBase):
                           params={"date": date})
         return Response(r, desc)
 
-    def groupSync(self, userId, group_id_name):
+    def groupSync(self, userId, groups):
         """
         同步用户所属群组方法(当第一次连接融云服务器时，需要向融云服务器提交 userId 对应的用户当前所加入的所有群组，此接口主要为防止应用中用户群信息同融云已知的用户所属群信息不同步。) 方法
-        @param  group_id_name:该用户的群信息，如群 Id 已经存在，则不会刷新对应群组名称，如果想刷新群组名称请调用刷新群组信息方法。
+        @param  lst:该用户的群信息[(groupid, groupname), (groupid, groupname)]，如群 Id 已经存在，则不会刷新对应群组名称，如果想刷新群组名称请调用刷新群组信息方法。
         @param  userId:被同步群信息的用户 Id。（必传）
 
         @return code:返回码，200 为正常。
@@ -723,9 +725,9 @@ class ApiClient(ApiClientBase):
                 "fields": [{"name": "code",
                             "type": "Integer",
                             "desc": "返回码，200 为正常。"}]}
-        r = self.call_api(action='/group/sync.json',
-                          params={"userId": userId,
-                                  "group_id_name": group_id_name})
+        params={'group[{0}]'.format(Id): name for Id, name in groups}
+        params['userId'] = userId
+        r = self.call_api(action='/group/sync.json', params=params)
         return Response(r, desc)
 
     def groupCreate(self, userId, groupId, groupName):
@@ -915,10 +917,10 @@ class ApiClient(ApiClientBase):
                           params={"groupId": groupId})
         return Response(r, desc)
 
-    def chatroomCreate(self, chatroom_id_name):
+    def chatroomCreate(self, chatrooms):
         """
         创建聊天室方法 方法
-        @param  chatroom_id_name:id:要创建的聊天室的id；name:要创建的聊天室的name。（必传）
+        @param  chatrooms:[(id, name)] id:要创建的聊天室的id；name:要创建的聊天室的name。（必传）
 
         @return code:返回码，200 为正常。
 	    """
@@ -928,8 +930,8 @@ class ApiClient(ApiClientBase):
                 "fields": [{"name": "code",
                             "type": "Integer",
                             "desc": "返回码，200 为正常。"}]}
-        r = self.call_api(action='/chatroom/create.json',
-                          params={"chatroom_id_name": chatroom_id_name})
+        params = {'chatroom[{0}]'.format(Id): name for Id, name in chatrooms}
+        r = self.call_api(action='/chatroom/create.json', params=params)
         return Response(r, desc)
 
     def chatroomJoin(self, userId, chatroomId):

@@ -140,8 +140,8 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(str(r.result['code']), '200')
 
     def test_groupSync(self):
-        r = self.client.groupSync(**{'userId': 'userid2',
-                                     'group_id_name': 'groupid2'})
+        r = self.client.groupSync(**{'userId': 'userid1',
+                                     'groups': [('groupid1', 'groupname2')]})
         self.log('groupSync', r)
         #self.assertEqual(r.status, 200)
         self.assertTrue('code' in r.result)
@@ -160,7 +160,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(str(r.result['code']), '200')
 
     def test_chatroomCreate(self):
-        r = self.client.chatroomCreate(**{'chatroom_id_name': 'chatroomid1'})
+        r = self.client.chatroomCreate(**{'chatrooms': [('id9', 'chatroom9')]})
         self.log('chatroomCreate', r)
         #self.assertEqual(r.status, 200)
         self.assertTrue('code' in r.result)
@@ -180,7 +180,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(str(r.result['code']), '200')
 
     def test_chatroomUserQuery(self):
-        r = self.client.chatroomUserQuery(**{'chatroomId': 'chatroomid3',
+        r = self.client.chatroomUserQuery(**{'chatroomId': 'chatroomid4',
                                              'count': '2',
                                              'order': '1'})
         self.log('chatroomUserQuery', r)
@@ -401,7 +401,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(str(r.result['code']), '200')
 
     def test_chatroomJoin(self):
-        r = self.client.chatroomJoin(**{'chatroomId': 'chatroomid3',
+        r = self.client.chatroomJoin(**{'chatroomId': 'chatroomid4',
                                         'userId': 'userid3'})
         self.log('chatroomJoin', r)
         #self.assertEqual(r.status, 200)
