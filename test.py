@@ -8,15 +8,12 @@ import logging
 
 from rong import ApiClient
 
-#app_key = ""
-#app_secret = ""
-
-#os.environ.setdefault('rongcloud_app_key', app_key)
-#os.environ.setdefault('rongcloud_app_secret', app_secret)
+app_key = os.environ.get('APP_KEY')
+app_secret = os.environ.get('APP_SECRET')
 
 logging.basicConfig(level=logging.INFO)
 
-client = ApiClient()
+client = ApiClient(app_key, app_secret)
 
 
 class ApiTest(unittest.TestCase):
@@ -199,6 +196,166 @@ class ApiTest(unittest.TestCase):
             chatroom_id_list=["tr001", "tr002"]
         )
         self.assertEqual(result[u'code'], 200)
+
+#############################################################3
+    def test_rollbackGagChatroomUser(self):
+        r = client.rollbackGagChatroomUser(**{'chatroomId': 'chatroomid1',
+                                                   'userId': 'userid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_publishTemplateMessage(self):
+        r = client.publishTemplateMessage(
+            **{"fromUserId": "userid1",
+               "objectName": "RC:TxtMsg",
+               "content": '{"content":"aa{c}{e}{d}","extra":"bb"}',
+               "toUserId": ["2579", "2580"],
+               "values": [{"{c}": "1",
+                           "{d}": "2",
+                           "{e}": "3"}, {"{c}": "4",
+                                         "{d}": "5",
+                                         "{e}": "6"}],
+               "pushContent": ["push{c}", "push{c}"],
+               "pushData": ["pushd", "pushd"]})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_addWordFilter(self):
+        r = client.addWordFilter(**{'word': 'word1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_rollbackBlockChatroomUser(self):
+        r = client.rollbackBlockChatroomUser(**{'chatroomId':
+                                                     'chatroomid1',
+                                                     'userId': 'userid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_groupUserQuery(self):
+        r = client.groupUserQuery(**{'groupId': 'groupid2'})
+        self.assertTrue('code' in r)
+        self.assertTrue('users' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_addGagChatroomUser(self):
+        r = client.addGagChatroomUser(**{'chatroomId': 'chatroomid1',
+                                              'userId': 'userid1',
+                                              'minute': '43200'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_broadcastMessage(self):
+        r = client.broadcastMessage(
+            **{'fromUserId': 'userid1',
+               'pushContent': 'userid1',
+               'content': '{"content":"hello","extra":"helloExtra"}',
+               'objectName': 'RC:TxtMsg',
+               'pushData': 'userid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_systemPublishTemplateMessage(self):
+        r = client.systemPublishTemplateMessage(
+            **{"fromUserId": "23245",
+               "objectName": "RC:TxtMsg",
+               "content": "{\"content\":\"aa{c}{e}{d}\",\"extra\":\"bb\"}",
+               "toUserId": ["2579", "2580"],
+               "values": [{"{c}": "1",
+                           "{d}": "2",
+                           "{e}": "3"}, {"{c}": "4",
+                                         "{d}": "5",
+                                         "{e}": "6"}],
+               "pushContent": ["push{c}", "push{c}"],
+               "pushData": ["pushd", "pushd"]})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_listGagGroupUser(self):
+        r = client.listGagGroupUser(**{'groupId': 'groupid1'})
+        self.assertTrue('code' in r)
+        self.assertTrue('users' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_HistoryMessageDelete(self):
+        r = client.HistoryMessageDelete(**{'date': 2016081114})
+        self.assertTrue('code' in r)
+        self.assertTrue('errorMessage' in r)
+        self.assertEqual(str(r['code']), '1002')
+        self.assertEqual(str(r['errorMessage']), 'data is not exist.')
+
+    def test_addGagGroupUser(self):
+        r = client.addGagGroupUser(**{'userId': 'userid1',
+                                           'minute': '43200',
+                                           'groupId': 'groupid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_resumeDistributionChatroomMessage(self):
+        r = client.resumeDistributionChatroomMessage(
+            **{'chatroomId': 'chatroomid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_addChatroomBlockUser(self):
+        r = client.addChatroomBlockUser(**{'chatroomId': 'chatroomid1',
+                                                'userId': 'userid1',
+                                                'minute': '43200'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_listBlockChatroomUser(self):
+        r = client.listBlockChatroomUser(**{'chatroomId': 'chatroomid1'})
+        self.assertTrue('code' in r)
+        self.assertTrue('users' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_stopDistributionChatroomMessage(self):
+        r = client.stopDistributionChatroomMessage(
+            **{'chatroomId': 'chatroomid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_listGagChatroomUser(self):
+        r = client.listGagChatroomUser(**{'chatroomId': 'chatroomid1'})
+        self.assertTrue('code' in r)
+        self.assertTrue('users' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_rooBackGagGroupUser(self):
+        r = client.rooBackGagGroupUser(**{'userId': 'userid1',
+                                               'groupId': 'groupid1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_publishDiscussionMessage(self):
+        r = client.publishDiscussionMessage(
+            **{'pushContent': 'userid1',
+               'content': '{"content":"hello","extra":"helloExtra"}',
+               'pushData': 'userid1',
+               'fromUserId': 'userid1',
+               'toDiscussionId': 'discussionid1',
+               'objectName': 'RC:TxtMsg'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_chatroomJoin(self):
+        r = client.chatroomJoin(**{'chatroomId': 'tr001',
+                                        'userId': 'userid3'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_listWordfilter(self):
+        r = client.listWordfilter(**{})
+        self.assertTrue('code' in r)
+        self.assertTrue('words' in r)
+        self.assertEqual(str(r['code']), '200')
+
+    def test_deleteWordfilter(self):
+        r = client.deleteWordfilter(**{'word': 'word1'})
+        self.assertTrue('code' in r)
+        self.assertEqual(str(r['code']), '200')
+
 
 if __name__ == "__main__":
     unittest.main()
