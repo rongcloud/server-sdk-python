@@ -3,6 +3,9 @@ server-sdk-python
 
 Rong Cloud Server SDK in Python.
 
+# 版本说明
+本sdk分为两个版本：v1.0 和v2.0，不互相兼容；版本以分支名称区分，主分支指向v2.0版本
+
 # python 版本
 server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 
