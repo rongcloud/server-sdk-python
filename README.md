@@ -4,13 +4,13 @@ server-sdk-python
 Rong Cloud Server SDK in Python.
 
 # 版本说明
-本sdk分为两个版本：v1.0 和v2.0，不互相兼容；版本以分支名称区分，主分支指向v2.0版本
+本 SDK 分为两个版本： V1.0 和 V2.0，不互相兼容；版本以分支名称区分，主分支指向 V2.0 版本
 
 # python 版本
 server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 
 # 依赖说明
-- 本sdk 依赖于requests
+- 本 SDK 依赖于 requests
 
 # API文档
 - 官方文档(http://www.rongcloud.cn/docs/server.html)
@@ -41,7 +41,7 @@ server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 ```
 
 ## 更多示例
-* 请参考单元测试test.py
+* 请参考单元测试 test.py
 
 ## 返回结果
 ```
@@ -159,9 +159,9 @@ publish = api.call_api(
 # 更新说明
 ### 20160801
 - 返回结果结构变更
-- 按官方文档(http://www.rongcloud.cn/docs/server.html) 补全Server API接口
+- 按官方文档(http://www.rongcloud.cn/docs/server.html) 补全 Server API 接口
 - 为每个接口添加参数及返回值说明信息
 
 ### 20150206
-- 去掉可能会导致SSL验证失败的代码
+- 去掉可能会导致 SSL 验证失败的代码
 - 更改环境变量名称，老的环境变量名称在某些操作系统中无法被识别
