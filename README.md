@@ -4,7 +4,7 @@ server-sdk-python
 Rong Cloud Server SDK in Python.
 
 # 版本说明
-本 SDK 分为两个版本： V1.0 和 V2.0，不互相兼容；版本以分支名称区分，主分支指向 V2.0 版本
+本 SDK 分为三个版本： V1.0、V2.0、V2.0.1, 不互相兼容；版本以分支名称区分，主分支指向 V2.0.1 版本
 
 # python 版本
 server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
@@ -20,28 +20,32 @@ server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 ## 示例
 ```
 >>> import os
->>> from rong import ApiClient
+>>> from rongcloud import RongCloud
 >>> app_key = os.environ['APP_KEY']
 >>> app_secret = os.environ['APP_SECRET']
->>> api = ApiClient(app_key, app_secret)
+>>> rcloud = RongCloud(app_key, app_secret)
 >>>
->>> r = api.getToken(userId='userid1', name='username', portraitUri='http://www.rongcloud.cn/images/logo.png')
+>>> r = rcloud.User.getToken(userId='userid1', name='username', portraitUri='http://www.rongcloud.cn/images/logo.png')
 >>> print(r)
 {'token': 'P9YNVZ2cMQwwaADiNDVrtRZKF+J2pVPOWSNlYMA1yA1g49pxjZs58n4FEufsH9XMCHTk6nHR6unQTuRgD8ZS/nlbkcv6ll4x', 'userId': 'userid1', 'code': 200}
 >>> 
->>> r = api.publishMessage(
-...     pushContent='userid1',
-...     toUserId='userid1',
-...     content=json.dumps({"content":"hello","extra":"helloExtra"}),
-...     pushData='userid1',
-...     fromUserId='userid1',
-...     objectName='RC:TxtMsg')
+>>> r = rcloud.Message.publishPrivate(
+...     fromUserId='userId1',
+...     toUserId='{"userId2","userid3","userId4"}',
+...     objectName='RC:VcMsg',
+...     content="{\"content\":\"hello\",\"extra\":\"helloExtra\",\"duration\":20}",
+...     pushContent='thisisapush',
+...     pushData='{\"pushData\":\"hello\"}',
+...     count='4',
+...     verifyBlacklist='0',
+...     isPersisted='0',
+...     isCounted='0')
 >>> print(r)
 {'code': 200}
 ```
 
 ## 更多示例
-* 请参考单元测试 test.py
+* 请参考单元测试 test.py, 但愿测试为每个 API 提供了一个调用示例。
 
 ## 返回结果
 ```
@@ -82,7 +86,9 @@ class Response(builtins.object)
 
 ## 底层API调用方法
 ```
-publish = api.call_api(
+from rongcloud import base
+rcloud = base.RongCloudBase(app_key, app_secret)
+publish = rcloud.call_api(
     action="/message/private/publish",
     params={
         "fromUserId": "user-id1",
@@ -110,58 +116,67 @@ publish = api.call_api(
 ```
 
 ## 高级API接口
-- getToken        获取 Token 
-- refreshUser        刷新用户信息
-- checkOnlineUser        检查用户在线状态 
-- blockUser        封禁用户
-- unBlockUser        解除用户封禁
-- queryBlockUser        获取被封禁用户
-- addUserBlacklist        添加用户到黑名单
-- removeBlacklistUser        从黑名单中移除用户
-- queryBlacklistUser        获取某用户的黑名单列表
-- publishMessage    发送单聊消息
-- publishTemplateMessage    发送单聊模板消息
-- systemPublishMessage  发送系统消息
-- systemPublishTemplateMessage  发送系统模板消息
-- publishGroupMessage   发送群组消息
-- publishDiscussionMessage  发送讨论组消息
-- publishChatroomMessage    发送聊天室消息
-- broadcastMessage  发送广播消息
-- addWordFilter        添加敏感词
-- deleteWordfilter        移除敏感词
-- listWordfilter        查询敏感词列表
-- historyMessage        消息历史记录下载地址获取
-- HistoryMessageDelete        消息历史记录删除
-- groupSync        同步用户所属群组
-- groupCreate        创建群组
-- groupjoin        将用户加入指定群组
-- groupQuit        退出群组
-- groupDismiss        解散群组
-- groupRefresh        刷新群组信息
-- groupUserQuery        查询群成员
-- addGagGroupUser        添加禁言群成员
-- rooBackGagGroupUser        移除禁言群成员
-- listGagGroupUser        查询被禁言群成员
-- chatroomCreate        创建聊天室
-- chatroomJoin        加入聊天室
-- chatroomDestroy        销毁聊天室
-- chatroomQuery        查询聊天室信息
-- chatroomUserQuery        查询聊天室内用户
-- stopDistributionChatroomMessage        聊天室消息停止分发
-- resumeDistributionChatroomMessage        聊天室消息恢复分发
-- addGagChatroomUser        添加禁言聊天室成员
-- rollbackGagChatroomUser        移除禁言聊天室成员
-- listGagChatroomUser        查询被禁言聊天室成员
-- addChatroomBlockUser        添加封禁聊天室成员
-- rollbackBlockChatroomUser        移除封禁聊天室成员
-- listBlockChatroomUser        查询被封禁聊天室成员
+### User
+- getToken  获取 Token 
+- refresh  刷新用户信息
+- checkOnline  检查用户在线状态 
+- block  封禁用户
+- unBlock  解除用户封禁
+- queryBlock  获取被封禁用户
+- addBlacklist  添加用户到黑名单
+- queryBlacklist  获取某用户的黑名单列表
+- removeBlacklist  从黑名单中移除用户
 
-# 更新说明
-### 20160801
-- 返回结果结构变更
-- 按官方文档(http://www.rongcloud.cn/docs/server.html) 补全 Server API 接口
-- 为每个接口添加参数及返回值说明信息
+### Message
+- publishPrivate  发送单聊消息
+- publishTemplate  发送单聊模板消息
+- PublishSystem  发送系统消息
+- publishSystemTemplate  发送系统模板消息
+- publishGroup  发送群组消息
+- publishDiscussion  发送讨论组消息
+- publishChatroom  发送聊天室消息
+- broadcast  发送广播消息
+- getHistory  消息历史记录下载地址获取 消息历史记录下载地址获取。获取 APP 内指定某天某小时内的所有会话消息记录的下载地址
+- deleteMessage  消息历史记录删除
 
-### 20150206
-- 去掉可能会导致 SSL 验证失败的代码
-- 更改环境变量名称，老的环境变量名称在某些操作系统中无法被识别
+### Wordfilter
+- add  添加敏感词
+- delete  移除敏感词
+- getList  查询敏感词列表
+
+### Group
+- create  创建群组
+- sync  同步用户所属群组
+- refresh  刷新群组信息
+- join  将用户加入指定群组，用户将可以收到该群的消息，同一用户最多可加入 500 个群，每个群最大至 3000 人
+- queryUser  查询群成员
+- quit  退出群组
+- addGagUser  添加禁言群成员
+- lisGagUser  查询被禁言群成员
+- rollBackGagUser  移除禁言群成员
+- dismiss  解散群组。
+
+### Chatroom
+- create  创建聊天室
+- join  加入聊天室
+- query  查询聊天室信息
+- queryUser  查询聊天室内用户
+- stopDistributionMessage  聊天室消息停止分发
+- resumeDistributionMessage  聊天室消息恢复分发
+- addGagUser  添加禁言聊天室成员
+- ListGagUser  查询被禁言聊天室成员
+- rollbackGagUser  移除禁言聊天室成员
+- addBlockUser  添加封禁聊天室成员
+- getListBlockUser  查询被封禁聊天室成员
+- rollbackBlockUser  移除封禁聊天室成员
+- destroy  销毁聊天室
+- addWhiteListUser  添加聊天室白名单成员
+
+### Push
+- setUserPushTag  添加 Push 标签
+- broadcastPush  广播消息
+
+### SMS
+- getImageCode  获取图片验证码
+- sendCode  发送短信验证码
+- verifyCode  验证码验证
