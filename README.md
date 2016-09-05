@@ -45,7 +45,7 @@ server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 ```
 
 ## 更多示例
-* 请参考单元测试 test.py, 但愿测试为每个 API 提供了一个调用示例。
+* 请参考单元测试 test.py, 单元测试为每个 API 提供了一个调用示例。
 
 ## 返回结果
 ```
