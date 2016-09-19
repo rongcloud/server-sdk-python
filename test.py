@@ -85,7 +85,7 @@ class Example(unittest.TestCase):
     def test_publishPrivate(self):
         r = self.rcloud.Message.publishPrivate(
             fromUserId='userId1',
-            toUserId='{"userId2","userid3","userId4"}',
+            toUserId={"userId2", "userid3", "userId4"},
             objectName='RC:VcMsg',
             content="{\"content\":\"hello\",\"extra\":\"helloExtra\",\"duration\":20}",
             pushContent='thisisapush',
@@ -101,6 +101,7 @@ class Example(unittest.TestCase):
     def test_publishTemplate(self):
         r = self.rcloud.Message.publishTemplate(
             templateMessage=json.load(open('jsonsource/TemplateMessage.json')))
+
         self.log('publishTemplate', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -108,7 +109,7 @@ class Example(unittest.TestCase):
     def test_PublishSystem(self):
         r = self.rcloud.Message.PublishSystem(
             fromUserId='userId1',
-            toUserId='{"userId2","userid3","userId4"}',
+            toUserId={"userId2", "userid3", "userId4"},
             objectName='RC:TxtMsg',
             content="{\"content\":\"hello\",\"extra\":\"helloExtra\"}",
             pushContent='thisisapush',
@@ -122,6 +123,7 @@ class Example(unittest.TestCase):
     def test_publishSystemTemplate(self):
         r = self.rcloud.Message.publishSystemTemplate(
             templateMessage=json.load(open('jsonsource/TemplateMessage.json')))
+
         self.log('publishSystemTemplate', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -129,7 +131,7 @@ class Example(unittest.TestCase):
     def test_publishGroup(self):
         r = self.rcloud.Message.publishGroup(
             fromUserId='userId',
-            toGroupId='{"groupId1","groupId2","groupId3"}',
+            toGroupId={"groupId1", "groupId2", "groupId3"},
             objectName='RC:TxtMsg',
             content="{\"content\":\"hello\",\"extra\":\"helloExtra\"}",
             pushContent='thisisapush',
@@ -157,7 +159,7 @@ class Example(unittest.TestCase):
     def test_publishChatroom(self):
         r = self.rcloud.Message.publishChatroom(
             fromUserId='userId1',
-            toChatroomId='{"ChatroomId1","ChatroomId2","ChatroomId3"}',
+            toChatroomId={"ChatroomId1", "ChatroomId2", "ChatroomId3"},
             objectName='RC:TxtMsg',
             content="{\"content\":\"hello\",\"extra\":\"helloExtra\"}")
         self.log('publishChatroom', r)
@@ -194,21 +196,21 @@ class Example(unittest.TestCase):
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
 
-    def test_delete(self):
-        r = self.rcloud.Wordfilter.delete(word='money')
-        self.log('delete', r)
-        self.assertTrue('code' in r.result)
-        self.assertEqual(r.result['code'], 200)
-
     def test_getList(self):
         r = self.rcloud.Wordfilter.getList()
         self.log('getList', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
 
+    def test_delete(self):
+        r = self.rcloud.Wordfilter.delete(word='money')
+        self.log('delete', r)
+        self.assertTrue('code' in r.result)
+        self.assertEqual(r.result['code'], 200)
+
     def test_create(self):
         r = self.rcloud.Group.create(
-            userId='{"userId1","userid2","userId3"}',
+            userId={"userId1", "userid2", "userId3"},
             groupId='groupId1',
             groupName='groupName1')
         self.log('create', r)
@@ -232,7 +234,7 @@ class Example(unittest.TestCase):
 
     def test_join(self):
         r = self.rcloud.Group.join(
-            userId='{"userId2","userid3","userId4"}',
+            userId={"userId2", "userid3", "userId4"},
             groupId='groupId1',
             groupName='TestGroup')
         self.log('join', r)
@@ -247,7 +249,7 @@ class Example(unittest.TestCase):
 
     def test_quit(self):
         r = self.rcloud.Group.quit(
-            userId='{"userId2","userid3","userId4"}', groupId='TestGroup')
+            userId={"userId2", "userid3", "userId4"}, groupId='TestGroup')
         self.log('quit', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -267,7 +269,7 @@ class Example(unittest.TestCase):
 
     def test_rollBackGagUser(self):
         r = self.rcloud.Group.rollBackGagUser(
-            userId='{"userId2","userid3","userId4"}', groupId='groupId1')
+            userId={"userId2", "userid3", "userId4"}, groupId='groupId1')
         self.log('rollBackGagUser', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -289,14 +291,14 @@ class Example(unittest.TestCase):
 
     def test_join(self):
         r = self.rcloud.Chatroom.join(
-            userId='{"userId2","userid3","userId4"}', chatroomId='chatroomId1')
+            userId={"userId2", "userid3", "userId4"}, chatroomId='chatroomId1')
         self.log('join', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
 
     def test_query(self):
         r = self.rcloud.Chatroom.query(
-            chatroomId='{"chatroomId1","chatroomId2","chatroomId3"}')
+            chatroomId={"chatroomId1", "chatroomId2", "chatroomId3"})
         self.log('query', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -364,7 +366,7 @@ class Example(unittest.TestCase):
 
     def test_destroy(self):
         r = self.rcloud.Chatroom.destroy(
-            chatroomId='{"chatroomId","chatroomId1","chatroomId2"}')
+            chatroomId={"chatroomId", "chatroomId1", "chatroomId2"})
         self.log('destroy', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -372,7 +374,7 @@ class Example(unittest.TestCase):
     def test_addWhiteListUser(self):
         r = self.rcloud.Chatroom.addWhiteListUser(
             chatroomId='chatroomId',
-            userId='{"userId1","userId2","userId3","userId4","userId5"}')
+            userId={"userId1", "userId2", "userId3", "userId4", "userId5"})
         self.log('addWhiteListUser', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -380,6 +382,7 @@ class Example(unittest.TestCase):
     def test_setUserPushTag(self):
         r = self.rcloud.Push.setUserPushTag(
             userTag=json.load(open('jsonsource/UserTag.json')))
+
         self.log('setUserPushTag', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
@@ -387,6 +390,7 @@ class Example(unittest.TestCase):
     def test_broadcastPush(self):
         r = self.rcloud.Push.broadcastPush(
             pushMessage=json.load(open('jsonsource/PushMessage.json')))
+
         self.log('broadcastPush', r)
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)

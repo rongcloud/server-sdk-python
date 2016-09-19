@@ -31,11 +31,11 @@ server-sdk-python supports Python 2.6, Python 2.7 and Python 3.3+
 >>> 
 >>> r = rcloud.Message.publishPrivate(
 ...     fromUserId='userId1',
-...     toUserId='{"userId2","userid3","userId4"}',
+...     toUserId={"userId2","userid3","userId4"},
 ...     objectName='RC:VcMsg',
-...     content="{\"content\":\"hello\",\"extra\":\"helloExtra\",\"duration\":20}",
+...     content='{"content":"hello","extra":"helloExtra","duration":20}',
 ...     pushContent='thisisapush',
-...     pushData='{\"pushData\":\"hello\"}',
+...     pushData='{"pushData":"hello"}',
 ...     count='4',
 ...     verifyBlacklist='0',
 ...     isPersisted='0',
