@@ -28,28 +28,6 @@ class Wordfilter(RongCloudBase):
             params={"word": word})
         return Response(r, desc)
 
-    def delete(self, word):
-        """
-        移除敏感词方法（从敏感词列表中，移除某一敏感词。） 方法
-        @param  word:敏感词，最长不超过 32 个字符。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
-
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/wordfilter/delete.json',
-            params={"word": word})
-        return Response(r, desc)
-
     def getList(self):
         """
         查询敏感词列表方法 方法
@@ -73,4 +51,26 @@ class Wordfilter(RongCloudBase):
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/wordfilter/list.json',
             params={})
+        return Response(r, desc)
+
+    def delete(self, word):
+        """
+        移除敏感词方法（从敏感词列表中，移除某一敏感词。） 方法
+        @param  word:敏感词，最长不超过 32 个字符。（必传）
+	 
+        @return code:返回码，200 为正常。
+        @return errorMessage:错误信息。
+	    """
+
+        desc = {"name": "CodeSuccessReslut",
+                "desc": " http 成功返回结果",
+                "fields": [{"name": "code",
+                            "type": "Integer",
+                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
+                                                      "type": "String",
+                                                      "desc": "错误信息。"}]}
+        r = self.call_api(
+            method=('API', 'POST', 'application/x-www-form-urlencoded'),
+            action='/wordfilter/delete.json',
+            params={"word": word})
         return Response(r, desc)

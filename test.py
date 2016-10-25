@@ -364,6 +364,13 @@ class Example(unittest.TestCase):
         self.assertTrue('code' in r.result)
         self.assertEqual(r.result['code'], 200)
 
+    def test_addPriority(self):
+        r = self.rcloud.Chatroom.addPriority(
+            objectName={"RC:VcMsg", "RC:ImgTextMsg", "RC:ImgMsg"})
+        self.log('addPriority', r)
+        self.assertTrue('code' in r.result)
+        self.assertEqual(r.result['code'], 200)
+
     def test_destroy(self):
         r = self.rcloud.Chatroom.destroy(
             chatroomId={"chatroomId", "chatroomId1", "chatroomId2"})

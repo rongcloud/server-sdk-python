@@ -171,6 +171,7 @@ publish = rcloud.call_api(
 - rollbackBlockUser  移除封禁聊天室成员
 - destroy  销毁聊天室
 - addWhiteListUser  添加聊天室白名单成员
+- addPriority  添加聊天室消息优先级
 
 ### Push
 - setUserPushTag  添加 Push 标签

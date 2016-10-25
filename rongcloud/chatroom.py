@@ -309,6 +309,28 @@ class Chatroom(RongCloudBase):
                     "chatroomId": chatroomId})
         return Response(r, desc)
 
+    def addPriority(self, objectName):
+        """
+        添加聊天室消息优先级方法 方法
+        @param  objectName:低优先级的消息类型，每次最多提交 5 个，设置的消息类型最多不超过 20 个。（必传）
+	 
+        @return code:返回码，200 为正常。
+        @return errorMessage:错误信息。
+	    """
+
+        desc = {"name": "CodeSuccessReslut",
+                "desc": " http 成功返回结果",
+                "fields": [{"name": "code",
+                            "type": "Integer",
+                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
+                                                      "type": "String",
+                                                      "desc": "错误信息。"}]}
+        r = self.call_api(
+            method=('API', 'POST', 'application/x-www-form-urlencoded'),
+            action='/chatroom/message/priority/add.json',
+            params={"objectName": objectName})
+        return Response(r, desc)
+
     def destroy(self, chatroomId):
         """
         销毁聊天室方法 方法
