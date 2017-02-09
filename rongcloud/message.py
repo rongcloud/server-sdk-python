@@ -16,7 +16,8 @@ class Message(RongCloudBase):
                        count=None,
                        verifyBlacklist=None,
                        isPersisted=None,
-                       isCounted=None):
+                       isCounted=None,
+                       isIncludeSender=None):
         """
         发送单聊消息方法（一个用户向另外一个用户发送消息，单条消息最大 128k。每分钟最多发送 6000 条信息，每次发送用户上限为 1000 人，如：一次发送 1000 人时，示为 1000 条消息。） 方法
         @param  fromUserId:发送人用户 Id。（必传）
@@ -28,31 +29,41 @@ class Message(RongCloudBase):
         @param  verifyBlacklist:是否过滤发送人黑名单列表，0 表示为不过滤、 1 表示为过滤，默认为 0 不过滤。（可选）
         @param  isPersisted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行存储，0 表示为不存储、 1 表示为存储，默认为 1 存储消息。（可选）
         @param  isCounted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行未读消息计数，0 表示为不计数、 1 表示为计数，默认为 1 计数，未读消息数增加 1。（可选）
+        @param  isIncludeSender:发送用户自已是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。（可选）
 	 
         @return code:返回码，200 为正常。
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/private/publish.json',
-            params={"fromUserId": fromUserId,
-                    "toUserId": toUserId,
-                    "objectName": objectName,
-                    "content": content,
-                    "pushContent": pushContent,
-                    "pushData": pushData,
-                    "count": count,
-                    "verifyBlacklist": verifyBlacklist,
-                    "isPersisted": isPersisted,
-                    "isCounted": isCounted})
+            params={
+                "fromUserId": fromUserId,
+                "toUserId": toUserId,
+                "objectName": objectName,
+                "content": content,
+                "pushContent": pushContent,
+                "pushData": pushData,
+                "count": count,
+                "verifyBlacklist": verifyBlacklist,
+                "isPersisted": isPersisted,
+                "isCounted": isCounted,
+                "isIncludeSender": isIncludeSender
+            })
         return Response(r, desc)
 
     def publishTemplate(self, templateMessage):
@@ -64,13 +75,19 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/json'),
             action='/message/private/publish_template.json',
@@ -100,24 +117,32 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/system/publish.json',
-            params={"fromUserId": fromUserId,
-                    "toUserId": toUserId,
-                    "objectName": objectName,
-                    "content": content,
-                    "pushContent": pushContent,
-                    "pushData": pushData,
-                    "isPersisted": isPersisted,
-                    "isCounted": isCounted})
+            params={
+                "fromUserId": fromUserId,
+                "toUserId": toUserId,
+                "objectName": objectName,
+                "content": content,
+                "pushContent": pushContent,
+                "pushData": pushData,
+                "isPersisted": isPersisted,
+                "isCounted": isCounted
+            })
         return Response(r, desc)
 
     def publishSystemTemplate(self, templateMessage):
@@ -129,13 +154,19 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/json'),
             action='/message/system/publish_template.json',
@@ -150,7 +181,8 @@ class Message(RongCloudBase):
                      pushContent=None,
                      pushData=None,
                      isPersisted=None,
-                     isCounted=None):
+                     isCounted=None,
+                     isIncludeSender=None):
         """
         发送群组消息方法（以一个用户身份向群组发送消息，单条消息最大 128k.每秒钟最多发送 20 条消息，每次最多向 3 个群组发送，如：一次向 3 个群组发送消息，示为 3 条消息。） 方法
         @param  fromUserId:发送人用户 Id 。（必传）
@@ -160,29 +192,39 @@ class Message(RongCloudBase):
         @param  pushData:针对 iOS 平台为 Push 通知时附加到 payload 中，Android 客户端收到推送消息时对应字段名为 pushData。（可选）
         @param  isPersisted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行存储，0 表示为不存储、 1 表示为存储，默认为 1 存储消息。（可选）
         @param  isCounted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行未读消息计数，0 表示为不计数、 1 表示为计数，默认为 1 计数，未读消息数增加 1。（可选）
+        @param  isIncludeSender:发送用户自已是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。（可选）
 	 
         @return code:返回码，200 为正常。
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/group/publish.json',
-            params={"fromUserId": fromUserId,
-                    "toGroupId": toGroupId,
-                    "objectName": objectName,
-                    "content": content,
-                    "pushContent": pushContent,
-                    "pushData": pushData,
-                    "isPersisted": isPersisted,
-                    "isCounted": isCounted})
+            params={
+                "fromUserId": fromUserId,
+                "toGroupId": toGroupId,
+                "objectName": objectName,
+                "content": content,
+                "pushContent": pushContent,
+                "pushData": pushData,
+                "isPersisted": isPersisted,
+                "isCounted": isCounted,
+                "isIncludeSender": isIncludeSender
+            })
         return Response(r, desc)
 
     def publishDiscussion(self,
@@ -193,7 +235,8 @@ class Message(RongCloudBase):
                           pushContent=None,
                           pushData=None,
                           isPersisted=None,
-                          isCounted=None):
+                          isCounted=None,
+                          isIncludeSender=None):
         """
         发送讨论组消息方法（以一个用户身份向讨论组发送消息，单条消息最大 128k，每秒钟最多发送 20 条消息.） 方法
         @param  fromUserId:发送人用户 Id。（必传）
@@ -203,29 +246,39 @@ class Message(RongCloudBase):
         @param  pushData:针对 iOS 平台为 Push 通知时附加到 payload 中，Android 客户端收到推送消息时对应字段名为 pushData.（可选）
         @param  isPersisted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行存储，0 表示为不存储、 1 表示为存储，默认为 1 存储消息.（可选）
         @param  isCounted:当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行未读消息计数，0 表示为不计数、 1 表示为计数，默认为 1 计数，未读消息数增加 1。（可选）
+        @param  isIncludeSender:发送用户自已是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。（可选）
 	 
         @return code:返回码，200 为正常。
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/discussion/publish.json',
-            params={"fromUserId": fromUserId,
-                    "toDiscussionId": toDiscussionId,
-                    "objectName": objectName,
-                    "content": content,
-                    "pushContent": pushContent,
-                    "pushData": pushData,
-                    "isPersisted": isPersisted,
-                    "isCounted": isCounted})
+            params={
+                "fromUserId": fromUserId,
+                "toDiscussionId": toDiscussionId,
+                "objectName": objectName,
+                "content": content,
+                "pushContent": pushContent,
+                "pushData": pushData,
+                "isPersisted": isPersisted,
+                "isCounted": isCounted,
+                "isIncludeSender": isIncludeSender
+            })
         return Response(r, desc)
 
     def publishChatroom(self, fromUserId, toChatroomId, objectName, content):
@@ -239,20 +292,28 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/chatroom/publish.json',
-            params={"fromUserId": fromUserId,
-                    "toChatroomId": toChatroomId,
-                    "objectName": objectName,
-                    "content": content})
+            params={
+                "fromUserId": fromUserId,
+                "toChatroomId": toChatroomId,
+                "objectName": objectName,
+                "content": content
+            })
         return Response(r, desc)
 
     def broadcast(self,
@@ -274,22 +335,30 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/broadcast.json',
-            params={"fromUserId": fromUserId,
-                    "objectName": objectName,
-                    "content": content,
-                    "pushContent": pushContent,
-                    "pushData": pushData,
-                    "os": os})
+            params={
+                "fromUserId": fromUserId,
+                "objectName": objectName,
+                "content": content,
+                "pushContent": pushContent,
+                "pushData": pushData,
+                "os": os
+            })
         return Response(r, desc)
 
     def getHistory(self, date):
@@ -303,19 +372,27 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "HistoryMessageReslut",
-                "desc": "historyMessage返回结果",
-                "fields":
-                [{"name": "code",
-                  "type": "Integer",
-                  "desc": "返回码，200 为正常。"}, {"name": "url",
-                                            "type": "String",
-                                            "desc": "历史消息下载地址。"},
-                 {"name": "date",
-                  "type": "String",
-                  "desc": "历史记录时间。（yyyymmddhh）"}, {"name": "errorMessage",
-                                                   "type": "String",
-                                                   "desc": "错误信息。"}]}
+        desc = {
+            "name": "HistoryMessageReslut",
+            "desc": "historyMessage返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "url",
+                "type": "String",
+                "desc": "历史消息下载地址。"
+            }, {
+                "name": "date",
+                "type": "String",
+                "desc": "历史记录时间。（yyyymmddhh）"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/history.json',
@@ -331,13 +408,19 @@ class Message(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/message/history/delete.json',

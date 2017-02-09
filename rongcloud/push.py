@@ -15,13 +15,19 @@ class Push(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/json'),
             action='/user/tag/set.json',
@@ -37,13 +43,19 @@ class Push(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/json'),
             action='/push.json',

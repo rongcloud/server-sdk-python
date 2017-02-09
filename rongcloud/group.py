@@ -17,19 +17,27 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/create.json',
-            params={"userId": userId,
-                    "groupId": groupId,
-                    "groupName": groupName})
+            params={
+                "userId": userId,
+                "groupId": groupId,
+                "groupName": groupName
+            })
         return Response(r, desc)
 
     def sync(self, userId, groupInfo):
@@ -42,13 +50,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         params = {'group[{0}]'.format(Id): name for Id, name in groupInfo}
         params['userId'] = userId
         r = self.call_api(
@@ -67,13 +81,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/refresh.json',
@@ -92,19 +112,27 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/join.json',
-            params={"userId": userId,
-                    "groupId": groupId,
-                    "groupName": groupName})
+            params={
+                "userId": userId,
+                "groupId": groupId,
+                "groupName": groupName
+            })
         return Response(r, desc)
 
     def queryUser(self, groupId):
@@ -117,16 +145,23 @@ class Group(RongCloudBase):
         @return users:群成员列表。
 	    """
 
-        desc = {"name": "GroupUserQueryReslut",
-                "desc": "groupUserQuery返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "id",
-                                                      "type": "String",
-                                                      "desc": "群成员用户Id。"},
-                           {"name": "users",
-                            "type": "List<GroupUser>",
-                            "desc": "群成员列表。"}]}
+        desc = {
+            "name": "GroupUserQueryReslut",
+            "desc": "groupUserQuery返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "id",
+                "type": "String",
+                "desc": "群成员用户Id。"
+            }, {
+                "name": "users",
+                "type": "List<GroupUser>",
+                "desc": "群成员列表。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/user/query.json',
@@ -143,13 +178,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/quit.json',
@@ -168,13 +209,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/user/gag/add.json',
@@ -193,16 +240,23 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ListGagGroupUserReslut",
-                "desc": " lisitGagGroupUser 返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常."},
-                           {"name": "users",
-                            "type": "List<GagGroupUser>",
-                            "desc": "群组被禁言用户列表。"}, {"name": "errorMessage",
-                                                    "type": "String",
-                                                    "desc": "错误信息。"}]}
+        desc = {
+            "name": "ListGagGroupUserReslut",
+            "desc": " lisitGagGroupUser 返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常."
+            }, {
+                "name": "users",
+                "type": "List<GagGroupUser>",
+                "desc": "群组被禁言用户列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/user/gag/list.json',
@@ -219,13 +273,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/user/gag/rollback.json',
@@ -243,13 +303,19 @@ class Group(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/group/dismiss.json',

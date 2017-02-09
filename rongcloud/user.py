@@ -22,29 +22,34 @@ class User(RongCloudBase):
         desc = {
             "name": "TokenReslut",
             "desc": "getToken 返回结果",
-            "fields":
-            [{"name": "code",
-              "type": "Integer",
-              "desc":
-              "返回码，200 为正常.如果您正在使用开发环境的 AppKey，您的应用只能注册 100 名用户，达到上限后，将返回错误码 2007.如果您需要更多的测试账户数量，您需要在应用配置中申请“增加测试人数”。"
-              },
-             {"name": "token",
-              "type": "String",
-              "desc":
-              "用户 Token，可以保存应用内，长度在 256 字节以内.用户 Token，可以保存应用内，长度在 256 字节以内。"},
-             {"name": "userId",
-              "type": "String",
-              "desc": "用户 Id，与输入的用户 Id 相同.用户 Id，与输入的用户 Id 相同。"},
-             {"name": "errorMessage",
-              "type": "String",
-              "desc": "错误信息。"}]
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc":
+                "返回码，200 为正常.如果您正在使用开发环境的 AppKey，您的应用只能注册 100 名用户，达到上限后，将返回错误码 2007.如果您需要更多的测试账户数量，您需要在应用配置中申请“增加测试人数”。"
+            }, {
+                "name": "token",
+                "type": "String",
+                "desc":
+                "用户 Token，可以保存应用内，长度在 256 字节以内.用户 Token，可以保存应用内，长度在 256 字节以内。"
+            }, {
+                "name": "userId",
+                "type": "String",
+                "desc": "用户 Id，与输入的用户 Id 相同.用户 Id，与输入的用户 Id 相同。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
         }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/getToken.json',
-            params={"userId": userId,
-                    "name": name,
-                    "portraitUri": portraitUri})
+            params={
+                "userId": userId,
+                "name": name,
+                "portraitUri": portraitUri
+            })
         return Response(r, desc)
 
     def refresh(self, userId, name=None, portraitUri=None):
@@ -58,19 +63,27 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/refresh.json',
-            params={"userId": userId,
-                    "name": name,
-                    "portraitUri": portraitUri})
+            params={
+                "userId": userId,
+                "name": name,
+                "portraitUri": portraitUri
+            })
         return Response(r, desc)
 
     def checkOnline(self, userId):
@@ -83,17 +96,23 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CheckOnlineReslut",
-                "desc": "checkOnlineUser返回结果",
-                "fields":
-                [{"name": "code",
-                  "type": "Integer",
-                  "desc": "返回码，200 为正常。"}, {"name": "status",
-                                            "type": "String",
-                                            "desc": "在线状态，1为在线，0为不在线。"},
-                 {"name": "errorMessage",
-                  "type": "String",
-                  "desc": "错误信息。"}]}
+        desc = {
+            "name": "CheckOnlineReslut",
+            "desc": "checkOnlineUser返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "status",
+                "type": "String",
+                "desc": "在线状态，1为在线，0为不在线。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/checkOnline.json',
@@ -110,13 +129,19 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/block.json',
@@ -133,13 +158,19 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/unblock.json',
@@ -155,16 +186,23 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "QueryBlockUserReslut",
-                "desc": "queryBlockUser返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"},
-                           {"name": "users",
-                            "type": "List<BlockUsers>",
-                            "desc": "被封禁用户列表。"}, {"name": "errorMessage",
-                                                  "type": "String",
-                                                  "desc": "错误信息。"}]}
+        desc = {
+            "name": "QueryBlockUserReslut",
+            "desc": "queryBlockUser返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "users",
+                "type": "List<BlockUsers>",
+                "desc": "被封禁用户列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/block/query.json',
@@ -181,13 +219,19 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/blacklist/add.json',
@@ -205,16 +249,23 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "QueryBlacklistUserReslut",
-                "desc": "queryBlacklistUser返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "users",
-                                                      "type": "String[]",
-                                                      "desc": "黑名单用户列表。"},
-                           {"name": "errorMessage",
-                            "type": "String",
-                            "desc": "错误信息。"}]}
+        desc = {
+            "name": "QueryBlacklistUserReslut",
+            "desc": "queryBlacklistUser返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "users",
+                "type": "String[]",
+                "desc": "黑名单用户列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/blacklist/query.json',
@@ -231,13 +282,19 @@ class User(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/user/blacklist/remove.json',

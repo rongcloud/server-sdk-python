@@ -15,13 +15,19 @@ class Wordfilter(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/wordfilter/add.json',
@@ -37,16 +43,23 @@ class Wordfilter(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ListWordfilterReslut",
-                "desc": "listWordfilter返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "word",
-                                                      "type": "String",
-                                                      "desc": "敏感词内容。"},
-                           {"name": "errorMessage",
-                            "type": "String",
-                            "desc": "错误信息。"}]}
+        desc = {
+            "name": "ListWordfilterReslut",
+            "desc": "listWordfilter返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "word",
+                "type": "String",
+                "desc": "敏感词内容。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/wordfilter/list.json',
@@ -62,13 +75,19 @@ class Wordfilter(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/wordfilter/delete.json',

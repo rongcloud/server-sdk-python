@@ -15,15 +15,23 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
-        params = {'chatroom[{0}]'.format(Id): name
-                  for Id, name in chatRoomInfo}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
+        params = {
+            'chatroom[{0}]'.format(Id): name
+            for Id, name in chatRoomInfo
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/create.json',
@@ -40,13 +48,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/join.json',
@@ -64,16 +78,23 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ChatroomQueryReslut",
-                "desc": " chatroomQuery 返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "chatRooms",
-                                                      "type": "List<ChatRoom>",
-                                                      "desc": "聊天室信息数组。"},
-                           {"name": "errorMessage",
-                            "type": "String",
-                            "desc": "错误信息。"}]}
+        desc = {
+            "name": "ChatroomQueryReslut",
+            "desc": " chatroomQuery 返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "chatRooms",
+                "type": "List<ChatRoom>",
+                "desc": "聊天室信息数组。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/query.json',
@@ -93,18 +114,27 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ChatroomUserQueryReslut",
-                "desc": " chatroomUserQuery 返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "total",
-                                                      "type": "Integer",
-                                                      "desc": "聊天室中用户数。"},
-                           {"name": "users",
-                            "type": "List<ChatRoomUser>",
-                            "desc": "聊天室成员列表。"}, {"name": "errorMessage",
-                                                  "type": "String",
-                                                  "desc": "错误信息。"}]}
+        desc = {
+            "name": "ChatroomUserQueryReslut",
+            "desc": " chatroomUserQuery 返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "total",
+                "type": "Integer",
+                "desc": "聊天室中用户数。"
+            }, {
+                "name": "users",
+                "type": "List<ChatRoomUser>",
+                "desc": "聊天室成员列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/query.json',
@@ -122,13 +152,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/message/stopDistribution.json',
@@ -144,13 +180,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/message/resumeDistribution.json',
@@ -168,19 +210,27 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/gag/add.json',
-            params={"userId": userId,
-                    "chatroomId": chatroomId,
-                    "minute": minute})
+            params={
+                "userId": userId,
+                "chatroomId": chatroomId,
+                "minute": minute
+            })
         return Response(r, desc)
 
     def ListGagUser(self, chatroomId):
@@ -193,16 +243,23 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ListGagChatroomUserReslut",
-                "desc": "listGagChatroomUser返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"},
-                           {"name": "users",
-                            "type": "List<GagChatRoomUser>",
-                            "desc": "聊天室被禁言用户列表。"}, {"name": "errorMessage",
-                                                     "type": "String",
-                                                     "desc": "错误信息。"}]}
+        desc = {
+            "name": "ListGagChatroomUserReslut",
+            "desc": "listGagChatroomUser返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "users",
+                "type": "List<GagChatRoomUser>",
+                "desc": "聊天室被禁言用户列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/gag/list.json',
@@ -219,13 +276,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/gag/rollback.json',
@@ -244,19 +307,27 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/block/add.json',
-            params={"userId": userId,
-                    "chatroomId": chatroomId,
-                    "minute": minute})
+            params={
+                "userId": userId,
+                "chatroomId": chatroomId,
+                "minute": minute
+            })
         return Response(r, desc)
 
     def getListBlockUser(self, chatroomId):
@@ -269,16 +340,23 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "ListBlockChatroomUserReslut",
-                "desc": "listBlockChatroomUser返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"},
-                           {"name": "users",
-                            "type": "List<BlockChatRoomUser>",
-                            "desc": "被封禁用户列表。"}, {"name": "errorMessage",
-                                                  "type": "String",
-                                                  "desc": "错误信息。"}]}
+        desc = {
+            "name": "ListBlockChatroomUserReslut",
+            "desc": "listBlockChatroomUser返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "users",
+                "type": "List<BlockChatRoomUser>",
+                "desc": "被封禁用户列表。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/block/list.json',
@@ -295,13 +373,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/block/rollback.json',
@@ -318,13 +402,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/message/priority/add.json',
@@ -340,13 +430,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/destroy.json',
@@ -363,13 +459,19 @@ class Chatroom(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "CodeSuccessReslut",
+            "desc": " http 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('API', 'POST', 'application/x-www-form-urlencoded'),
             action='/chatroom/user/whitelist/add.json',

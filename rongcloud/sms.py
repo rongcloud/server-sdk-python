@@ -17,19 +17,27 @@ class SMS(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "SMSImageCodeReslut",
-                "desc": " getImageCode 成功返回结果",
-                "fields":
-                [{"name": "code",
-                  "type": "Integer",
-                  "desc": "返回码，200 为正常。"}, {"name": "url",
-                                            "type": "String",
-                                            "desc": "返回的图片验证码 URL 地址。"},
-                 {"name": "verifyId",
-                  "type": "String",
-                  "desc": "返回图片验证标识 Id。"}, {"name": "errorMessage",
-                                            "type": "String",
-                                            "desc": "错误信息。"}]}
+        desc = {
+            "name": "SMSImageCodeReslut",
+            "desc": " getImageCode 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "url",
+                "type": "String",
+                "desc": "返回的图片验证码 URL 地址。"
+            }, {
+                "name": "verifyId",
+                "type": "String",
+                "desc": "返回图片验证标识 Id。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('SMS', 'GET', ''),
             action='/getImgCode.json',
@@ -55,24 +63,33 @@ class SMS(RongCloudBase):
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "SMSSendCodeReslut",
-                "desc": " SMSSendCodeReslut 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "sessionId",
-                                                      "type": "String",
-                                                      "desc": "短信验证码唯一标识。"},
-                           {"name": "errorMessage",
-                            "type": "String",
-                            "desc": "错误信息。"}]}
+        desc = {
+            "name": "SMSSendCodeReslut",
+            "desc": " SMSSendCodeReslut 成功返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "sessionId",
+                "type": "String",
+                "desc": "短信验证码唯一标识。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('SMS', 'POST', 'application/x-www-form-urlencoded'),
             action='/sendCode.json',
-            params={"mobile": mobile,
-                    "templateId": templateId,
-                    "region": region,
-                    "verifyId": verifyId,
-                    "verifyCode": verifyCode})
+            params={
+                "mobile": mobile,
+                "templateId": templateId,
+                "region": region,
+                "verifyId": verifyId,
+                "verifyCode": verifyCode
+            })
         return Response(r, desc)
 
     def verifyCode(self, sessionId, code):
@@ -82,16 +99,27 @@ class SMS(RongCloudBase):
         @param  code:短信验证码内容。（必传）
 	 
         @return code:返回码，200 为正常。
+        @return success:true 验证成功，false 验证失败。
         @return errorMessage:错误信息。
 	    """
 
-        desc = {"name": "CodeSuccessReslut",
-                "desc": " http 成功返回结果",
-                "fields": [{"name": "code",
-                            "type": "Integer",
-                            "desc": "返回码，200 为正常。"}, {"name": "errorMessage",
-                                                      "type": "String",
-                                                      "desc": "错误信息。"}]}
+        desc = {
+            "name": "SMSVerifyCodeResult",
+            "desc": " VerifyCode 返回结果",
+            "fields": [{
+                "name": "code",
+                "type": "Integer",
+                "desc": "返回码，200 为正常。"
+            }, {
+                "name": "success",
+                "type": "Boolean",
+                "desc": "true 验证成功，false 验证失败。"
+            }, {
+                "name": "errorMessage",
+                "type": "String",
+                "desc": "错误信息。"
+            }]
+        }
         r = self.call_api(
             method=('SMS', 'POST', 'application/x-www-form-urlencoded'),
             action='/verifyCode.json',
