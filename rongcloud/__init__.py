@@ -18,15 +18,15 @@ from .sms import SMS
 
 
 class RongCloud:
-    def __init__(self, app_key=None, app_secret=None):
+    def __init__(self, app_key=None, app_secret=None, timeout=None):
         if app_key is None:
             app_key = os.environ.get('APP_KEY', '')
         if app_secret is None:
             app_secret = os.environ.get('APP_SECRET', '')
-        self.User = User(app_key, app_secret)
-        self.Message = Message(app_key, app_secret)
-        self.Wordfilter = Wordfilter(app_key, app_secret)
-        self.Group = Group(app_key, app_secret)
-        self.Chatroom = Chatroom(app_key, app_secret)
-        self.Push = Push(app_key, app_secret)
-        self.SMS = SMS(app_key, app_secret)
+        self.User = User(app_key, app_secret, timeout)
+        self.Message = Message(app_key, app_secret, timeout)
+        self.Wordfilter = Wordfilter(app_key, app_secret, timeout)
+        self.Group = Group(app_key, app_secret, timeout)
+        self.Chatroom = Chatroom(app_key, app_secret, timeout)
+        self.Push = Push(app_key, app_secret, timeout)
+        self.SMS = SMS(app_key, app_secret, timeout)

@@ -15,9 +15,10 @@ class RongCloudBase(object):
     api_host = "http://api.cn.ronghub.com"
     sms_host = "http://api.sms.ronghub.com"
 
-    def __init__(self, key='', secret=''):
+    def __init__(self, key='', secret='', timeout=None):
         self._app_key = key
         self._app_secret = secret
+        self.timeout = timeout
 
     @staticmethod
     def _merge_dict(data, *override):
@@ -68,6 +69,7 @@ class RongCloudBase(object):
     def call_api(self,
                  action,
                  params=None,
+                 timeout=None,
                  method=('API', 'POST', 'application/x-www-form-urlencoded'),
                  **kwargs):
         """
@@ -86,11 +88,13 @@ class RongCloudBase(object):
             data = json.dumps(params)
         else:
             data = self._filter_params(params)
+        timeout = self.timeout if timeout is None else timeout
         return self._http_call(
             url=url + action,
             method=methodname,
             data=data,
             headers=self._headers(content_type),
+            timeout=timeout,
             **kwargs)
 
 
