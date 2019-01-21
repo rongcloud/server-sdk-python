@@ -1,303 +1,162 @@
-#!/usr/bin/env python
-# encoding: utf-8
-from .base import RongCloudBase, Response
+import json
+
+from rongcloud.Module import Module, ParamException
 
 
-class User(RongCloudBase):
-    """Server 开发指南, 请参阅 http://www.rongcloud.cn/docs/server.html"""
+class User(Module):
+    def __init__(self, rc):
+        super().__init__(rc)
 
-    def getToken(self, userId, name, portraitUri):
+    def register(self, user_id, name='', portrait_uri=''):
         """
-        获取 Token 方法 方法
-        @param  userId:用户 Id，最大长度 64 字节.是用户在 App 中的唯一标识码，必须保证在同一个 App 内不重复，重复的用户 Id 将被当作是同一用户。（必传）
-        @param  name:用户名称，最大长度 128 字节.用来在 Push 推送时显示用户的名称.用户名称，最大长度 128 字节.用来在 Push 推送时显示用户的名称。（必传）
-        @param  portraitUri:用户头像 URI，最大长度 1024 字节.用来在 Push 推送时显示用户的头像。（必传）
-	 
-        @return code:返回码，200 为正常.如果您正在使用开发环境的 AppKey，您的应用只能注册 100 名用户，达到上限后，将返回错误码 2007.如果您需要更多的测试账户数量，您需要在应用配置中申请“增加测试人数”。
-        @return token:用户 Token，可以保存应用内，长度在 256 字节以内.用户 Token，可以保存应用内，长度在 256 字节以内。
-        @return userId:用户 Id，与输入的用户 Id 相同.用户 Id，与输入的用户 Id 相同。
-        @return errorMessage:错误信息。
-	    """
-
-        desc = {
-            "name": "TokenReslut",
-            "desc": "getToken 返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc":
-                "返回码，200 为正常.如果您正在使用开发环境的 AppKey，您的应用只能注册 100 名用户，达到上限后，将返回错误码 2007.如果您需要更多的测试账户数量，您需要在应用配置中申请“增加测试人数”。"
-            }, {
-                "name": "token",
-                "type": "String",
-                "desc":
-                "用户 Token，可以保存应用内，长度在 256 字节以内.用户 Token，可以保存应用内，长度在 256 字节以内。"
-            }, {
-                "name": "userId",
-                "type": "String",
-                "desc": "用户 Id，与输入的用户 Id 相同.用户 Id，与输入的用户 Id 相同。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/getToken.json',
-            params={
-                "userId": userId,
-                "name": name,
-                "portraitUri": portraitUri
-            })
-        return Response(r, desc)
-
-    def refresh(self, userId, name=None, portraitUri=None):
+        注册用户，生成用户在融云的唯一身份标识 Token，各端 SDK 使用 Token 连接融云服务器。
+        :param user_id: 用户 ID，最大长度 64 字节.是用户在 App 中的唯一标识码，必须保证在同一个 App 内不重复，重复的用户 Id 将被当作是同一用户。
+        :param name: 用户名称，最大长度 128 字节.用来在 Push 推送时显示用户的名称.用户名称，最大长度 128 字节.用来在 Push 推送时显示用户的名称。
+        :param portrait_uri: 用户头像 URI，最大长度 1024 字节.用来在 Push 推送时显示用户的头像。
         """
-        刷新用户信息方法 方法
-        @param  userId:用户 Id，最大长度 64 字节.是用户在 App 中的唯一标识码，必须保证在同一个 App 内不重复，重复的用户 Id 将被当作是同一用户。（必传）
-        @param  name:用户名称，最大长度 128 字节。用来在 Push 推送时，显示用户的名称，刷新用户名称后 5 分钟内生效。（可选，提供即刷新，不提供忽略）
-        @param  portraitUri:用户头像 URI，最大长度 1024 字节。用来在 Push 推送时显示。（可选，提供即刷新，不提供忽略）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
+        param_dict = locals().copy()
+        url = '/user/getToken.json'
+        format_str = 'userId={{ user_id }}' \
+                     '&name ={{ name }}' \
+                     '&portraitUri={{ portrait_uri }}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(name, str, '0-128')
+            self._check_param(portrait_uri, str, '0-1024')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
 
-        desc = {
-            "name": "CodeSuccessReslut",
-            "desc": " http 成功返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/refresh.json',
-            params={
-                "userId": userId,
-                "name": name,
-                "portraitUri": portraitUri
-            })
-        return Response(r, desc)
-
-    def checkOnline(self, userId):
+    def update(self, user_id, name='', portrait_uri=''):
         """
-        检查用户在线状态 方法 方法
-        @param  userId:用户 Id，最大长度 64 字节。是用户在 App 中的唯一标识码，必须保证在同一个 App 内不重复，重复的用户 Id 将被当作是同一用户。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return status:在线状态，1为在线，0为不在线。
-        @return errorMessage:错误信息。
-	    """
-
-        desc = {
-            "name": "CheckOnlineReslut",
-            "desc": "checkOnlineUser返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "status",
-                "type": "String",
-                "desc": "在线状态，1为在线，0为不在线。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/checkOnline.json',
-            params={"userId": userId})
-        return Response(r, desc)
-
-    def block(self, userId, minute):
+        修改用户信息。
+        :param user_id: 用户 ID，最大长度 64 字节.是用户在 App 中的唯一标识码，必须保证在同一个 App 内不重复，重复的用户 Id 将被当作是同一用户。
+        :param name: 用户名称，最大长度 128 字节。用来在 Push 推送时，显示用户的名称，刷新用户名称后 5 分钟内生效。（可选，提供即刷新，不提供忽略）
+        :param portrait_uri: 用户头像 URI，最大长度 1024 字节。用来在 Push 推送时显示。（可选，提供即刷新，不提供忽略）
         """
-        封禁用户方法（每秒钟限 100 次） 方法
-        @param  userId:用户 Id。（必传）
-        @param  minute:封禁时长,单位为分钟，最大值为43200分钟。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
+        param_dict = locals().copy()
+        url = '/user/refresh.json'
+        format_str = 'userId={{ user_id }}' \
+                     '&name ={{ name }}' \
+                     '&portraitUri={{ portrait_uri }}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(name, str, '0-128')
+            self._check_param(portrait_uri, str, '0-1024')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
 
-        desc = {
-            "name": "CodeSuccessReslut",
-            "desc": " http 成功返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/block.json',
-            params={"userId": userId,
-                    "minute": minute})
-        return Response(r, desc)
+    def get_blacklist(self):
+        return Blacklist(self._rc)
 
-    def unBlock(self, userId):
+    def get_block(self):
+        return Block(self._rc)
+
+
+class Blacklist(Module):
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, user_id, black_ids):
         """
-        解除用户封禁方法（每秒钟限 100 次） 方法
-        @param  userId:用户 Id。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
-
-        desc = {
-            "name": "CodeSuccessReslut",
-            "desc": " http 成功返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/unblock.json',
-            params={"userId": userId})
-        return Response(r, desc)
-
-    def queryBlock(self):
+        将对方加入黑名单，屏蔽对方消息，但自己仍可给对方发送消息，应用中每个用户均可设置自己的黑名单。
+        :param user_id: 用户 ID。
+        :param black_ids: 被设置为黑名单的用户 ID 或 ID 列表。
         """
-        获取被封禁用户方法（每秒钟限 100 次） 方法
-	 
-        @return code:返回码，200 为正常。
-        @return users:被封禁用户列表。
-        @return errorMessage:错误信息。
-	    """
+        black_ids = self._tranlist(black_ids)
+        param_dict = locals().copy()
+        url = '/user/blacklist/add.json'
+        format_str = 'userId={{ user_id }}' \
+                     '{% for item in black_ids %}&blackUserId={{ item }}{% endfor %}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(black_ids, list)
+            for user in black_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
 
-        desc = {
-            "name": "QueryBlockUserReslut",
-            "desc": "queryBlockUser返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "users",
-                "type": "List<BlockUsers>",
-                "desc": "被封禁用户列表。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/block/query.json',
-            params={})
-        return Response(r, desc)
-
-    def addBlacklist(self, userId, blackUserId):
+    def remove(self, user_id, black_ids):
         """
-        添加用户到黑名单方法（每秒钟限 100 次） 方法
-        @param  userId:用户 Id。（必传）
-        @param  blackUserId:被加到黑名单的用户Id。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
-
-        desc = {
-            "name": "CodeSuccessReslut",
-            "desc": " http 成功返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/blacklist/add.json',
-            params={"userId": userId,
-                    "blackUserId": blackUserId})
-        return Response(r, desc)
-
-    def queryBlacklist(self, userId):
+        将用户从黑名单中移除。
+        :param user_id: 用户 ID。
+        :param black_ids: 被移除黑名单的用户 ID 或 ID 列表。
         """
-        获取某用户的黑名单列表方法（每秒钟限 100 次） 方法
-        @param  userId:用户 Id。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return users:黑名单用户列表。
-        @return errorMessage:错误信息。
-	    """
+        black_ids = self._tranlist(black_ids)
+        param_dict = locals().copy()
+        url = '/user/blacklist/remove.json'
+        format_str = 'userId={{ user_id }}' \
+                     '{% for item in black_ids %}&blackUserId={{ item }}{% endfor %}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(black_ids, list)
+            for user in black_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
 
-        desc = {
-            "name": "QueryBlacklistUserReslut",
-            "desc": "queryBlacklistUser返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "users",
-                "type": "String[]",
-                "desc": "黑名单用户列表。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/blacklist/query.json',
-            params={"userId": userId})
-        return Response(r, desc)
-
-    def removeBlacklist(self, userId, blackUserId):
+    def query(self, user_id):
         """
-        从黑名单中移除用户方法（每秒钟限 100 次） 方法
-        @param  userId:用户 Id。（必传）
-        @param  blackUserId:被移除的用户Id。（必传）
-	 
-        @return code:返回码，200 为正常。
-        @return errorMessage:错误信息。
-	    """
+        获取某个用户的黑名单列表。
+        :param user_id: 用户 ID。
+        """
+        param_dict = locals().copy()
+        url = '/user/blacklist/query.json'
+        format_str = 'userId={{ user_id }}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
 
-        desc = {
-            "name": "CodeSuccessReslut",
-            "desc": " http 成功返回结果",
-            "fields": [{
-                "name": "code",
-                "type": "Integer",
-                "desc": "返回码，200 为正常。"
-            }, {
-                "name": "errorMessage",
-                "type": "String",
-                "desc": "错误信息。"
-            }]
-        }
-        r = self.call_api(
-            method=('API', 'POST', 'application/x-www-form-urlencoded'),
-            action='/user/blacklist/remove.json',
-            params={"userId": userId,
-                    "blackUserId": blackUserId})
-        return Response(r, desc)
+
+class Block(Module):
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, user_ids, minute):
+        """
+        用户在封禁期间所有 IM 功能均不可用，例如 连接融云服务器、发送消息 封禁期满后自动解除封禁，功能恢复正常。
+        :param user_ids: 用户 ID 或 ID 列表。
+        :param minute: 封禁时长 1 - 1 * 30 * 24 * 60 分钟，最大值为 43200 分钟。
+        """
+        user_ids = self._tranlist(user_ids)
+        param_dict = locals().copy()
+        url = '/user/block.json'
+        format_str = '{% for item in user_ids %}userId={{ item }}&{% endfor %}' \
+                     '&minute={{ minute }}'
+        try:
+            self._check_param(user_ids, list, '1-20')
+            for user in user_ids:
+                self._check_param(user, str, '1-64')
+            self._check_param(minute, int, '1-43200')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, user_ids):
+        """
+        解除用户封禁。
+        :param user_ids: 用户 ID 或 ID 列表。
+        """
+        user_ids = self._tranlist(user_ids)
+        param_dict = locals().copy()
+        url = '/user/unblock.json'
+        format_str = '{% for item in user_ids %}userId={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
+        try:
+            self._check_param(user_ids, list, '1-20')
+            for user in user_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self):
+        """
+        获取封禁用户列表。
+        """
+        url = '/user/block/query.json'
+        return self._http_post(url)
