@@ -1,7 +1,7 @@
 import json
 import urllib
 
-from rongcloud.Module import Module, ParamException
+from rongcloud.module import Module, ParamException
 
 
 class Message(Module):

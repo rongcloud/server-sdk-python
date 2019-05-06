@@ -1,7 +1,7 @@
 import unittest
 
-from rongcloud.RongCloud import RongCloud
-from rongcloud.Sensitive import Sensitive
+from rongcloud.rongcloud import RongCloud
+from rongcloud.sensitive import Sensitive
 
 rc = RongCloud('8luwapkvucoil', 'y0icysjl4h3LWz')
 

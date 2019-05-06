@@ -1,6 +1,6 @@
 import json
 
-from rongcloud.Module import Module, ParamException
+from rongcloud.module import Module, ParamException
 
 
 class Sensitive(Module):

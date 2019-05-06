@@ -1,26 +1,16 @@
-from rongcloud.Chatroom import Chatroom
-from rongcloud.Conversation import Conversation
-from rongcloud.Group import Group
-from rongcloud.Message import Message
-from rongcloud.Sensitive import Sensitive
-from rongcloud.User import User
+from rongcloud.chatroom import Chatroom
+from rongcloud.conversation import Conversation
+from rongcloud.group import Group
+from rongcloud.message import Message
+from rongcloud.sensitive import Sensitive
+from rongcloud.user import User
 
 
 class RongCloud:
     class _HostUrl:
         def __init__(self, host_url):
-            self.host_list = host_url.split(',')
+            self.host_list = host_url.split(';')
             self.now = 0
-            self.times = 0
-
-        def reset_times(self):
-            self.times = 0
-
-        def add_times(self):
-            self.times = self.times + 1
-
-        def get_times(self):
-            return self.times
 
         def get_url(self):
             return self.host_list[self.now]
@@ -31,7 +21,7 @@ class RongCloud:
             else:
                 self.now = 0
 
-    def __init__(self, app_key, app_secret, host_url='http://api.cn.ronghub.com'):
+    def __init__(self, app_key, app_secret, host_url='http://api.cn.ronghub.com;http://api2-cn.ronghub.com'):
         self.app_key = app_key
         self.app_secret = app_secret
         self.host_url = self._HostUrl(host_url)

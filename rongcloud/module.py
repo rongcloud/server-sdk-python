@@ -53,11 +53,7 @@ class Module:
         except HTTPError as e:
             rep = e.read()
         except socket.timeout:
-            if self._rc.host_url.get_times() >= 2:
-                self._rc.host_url.switch_url()
-                self._rc.host_url.reset_times()
-            else:
-                self._rc.host_url.add_times()
+            self._rc.host_url.switch_url()
             raise
         return json.loads(rep.decode('utf8'))
 

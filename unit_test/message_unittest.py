@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from rongcloud.RongCloud import RongCloud
+from rongcloud.rongcloud import RongCloud
 
 rc = RongCloud('8luwapkvucoil', 'y0icysjl4h3LWz')
 

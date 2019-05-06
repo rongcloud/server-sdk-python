@@ -1,7 +1,7 @@
 import unittest
 
-from rongcloud.Conversation import Conversation
-from rongcloud.RongCloud import RongCloud
+from rongcloud.conversation import Conversation
+from rongcloud.rongcloud import RongCloud
 
 rc = RongCloud('8luwapkvucoil', 'y0icysjl4h3LWz')
 
