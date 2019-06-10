@@ -153,7 +153,7 @@ class Gag(Module):
         :param group_id: 群组 ID。
         :param minute: 禁言时长，以分钟为单位，最大值为43200分钟。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/group/user/gag/add.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
@@ -175,7 +175,7 @@ class Gag(Module):
         :param user_ids: 解除禁言群成员 ID 或 ID 列表。
         :param group_id: 群组 ID。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/group/user/gag/rollback.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \

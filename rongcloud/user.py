@@ -7,6 +7,9 @@ class User(Module):
     def __init__(self, rc):
         super().__init__(rc)
 
+    def get_tag(self):
+        return Tag(self._rc)
+
     def register(self, user_id, name='', portrait_uri=''):
         """
         注册用户，生成用户在融云的唯一身份标识 Token，各端 SDK 使用 Token 连接融云服务器。
@@ -64,7 +67,7 @@ class Blacklist(Module):
         :param user_id: 用户 ID。
         :param black_ids: 被设置为黑名单的用户 ID 或 ID 列表。
         """
-        black_ids = self._tranlist(black_ids)
+        black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
         url = '/user/blacklist/add.json'
         format_str = 'userId={{ user_id }}' \
@@ -84,7 +87,7 @@ class Blacklist(Module):
         :param user_id: 用户 ID。
         :param black_ids: 被移除黑名单的用户 ID 或 ID 列表。
         """
-        black_ids = self._tranlist(black_ids)
+        black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
         url = '/user/blacklist/remove.json'
         format_str = 'userId={{ user_id }}' \
@@ -123,7 +126,7 @@ class Block(Module):
         :param user_ids: 用户 ID 或 ID 列表。
         :param minute: 封禁时长 1 - 1 * 30 * 24 * 60 分钟，最大值为 43200 分钟。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/user/block.json'
         format_str = '{% for item in user_ids %}userId={{ item }}&{% endfor %}' \
@@ -142,7 +145,7 @@ class Block(Module):
         解除用户封禁。
         :param user_ids: 用户 ID 或 ID 列表。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/user/unblock.json'
         format_str = '{% for item in user_ids %}userId={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -160,3 +163,60 @@ class Block(Module):
         """
         url = '/user/block/query.json'
         return self._http_post(url)
+
+
+class Tag(Module):
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def set(self, user_ids, tags):
+        """
+        为应用中的用户添加标签，如果某用户已经添加了标签，再次对用户添加标签时将覆盖之前设置的标签内容。
+        :param user_ids:
+        :param tags:
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        if len(user_ids) == 1:
+            url = '/user/tag/set.json'
+            format_str = '{' \
+                         '"userId":"{{ user_id }}",' \
+                         '"tags":"[{% for item in tags %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],"' \
+                         '}'
+            try:
+                for user in user_ids:
+                    self._check_param(user, str, '1-64')
+                return self._http_post(url, self._render(param_dict, format_str))
+            except ParamException as e:
+                return json.loads(str(e))
+        else:
+            url = '/user/tag/batch/set.json'
+            format_str = '{' \
+                         '"userIds":[{% for item in user_ids %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
+                         '"tags":[{% for item in tags %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
+                         '}'
+            try:
+                self._check_param(tags, list, '1-1000')
+                for tag in tags:
+                    self._check_param(tag, str, '1-40')
+                return self._http_post(url, self._render(param_dict, format_str))
+            except ParamException as e:
+                return json.loads(str(e))
+
+    def get(self, user_ids):
+        """
+        为应用中的用户添加标签，如果某用户已经添加了标签，再次对用户添加标签时将覆盖之前设置的标签内容。
+        :param user_ids:
+        :param tags:
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/user/tag/get.json'
+        format_str = '{% for item in user_ids %}userIds={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
+        try:
+            self._check_param(user_ids, list, '1-50')
+            for user in user_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))

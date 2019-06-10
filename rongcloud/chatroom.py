@@ -98,7 +98,7 @@ class Block(Module):
         :param room_id: 聊天室 Id。
         :param minute: 封禁时长，以分钟为单位，最大值为43200分钟。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/block/add.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
@@ -120,7 +120,7 @@ class Block(Module):
         :param user_ids: 解封用户 ID 或 ID 列表，最多不超过 20 个用户。
         :param room_id: 聊天室 Id。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/block/rollback.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
@@ -160,7 +160,7 @@ class Ban(Module):
         :param user_ids: 封禁用户 ID 或 ID 列表，最多不超过 20 个用户。
         :param minute: 封禁时长，以分钟为单位，最大值为43200分钟。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/ban/add.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
@@ -179,7 +179,7 @@ class Ban(Module):
         解除聊天室全局禁言。
         :param user_ids: 解禁用户 ID 或 ID 列表，最多不超过 20 个用户。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/ban/remove.json'
         format_str = '{% for item in user_ids %}userId={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -211,7 +211,7 @@ class Gag(Module):
         :param room_id: 聊天室 Id。
         :param minute: 封禁时长，以分钟为单位，最大值为43200分钟。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/gag/add.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
@@ -231,7 +231,7 @@ class Gag(Module):
         """
         解除聊天室成员禁言。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/gag/rollback.json'
         format_str = '{% for item in user_ids %}userId={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}' \
@@ -269,7 +269,7 @@ class Demotion(Module):
         添加应用内聊天室降级消息。
         :param obj_names: 低优先级的消息类型，每次最多提交 5 个。
         """
-        obj_names = self._tranlist(obj_names)
+        obj_names = self._tran_list(obj_names)
         param_dict = locals().copy()
         url = '/chatroom/message/priority/add.json'
         format_str = '{% for item in obj_names %}objectName={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -286,7 +286,7 @@ class Demotion(Module):
         移除应用内聊天室降级消息。
         :param obj_names: 低优先级的消息类型，每次最多提交 5 个。
         """
-        obj_names = self._tranlist(obj_names)
+        obj_names = self._tran_list(obj_names)
         param_dict = locals().copy()
         url = '/chatroom/message/priority/remove.json'
         format_str = '{% for item in obj_names %}objectName={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -395,7 +395,7 @@ class MessageWhileList(Module):
         添加聊天室消息白名单。
         :param obj_names: 消息标识，最多不超过 20 个。
         """
-        obj_names = self._tranlist(obj_names)
+        obj_names = self._tran_list(obj_names)
         param_dict = locals().copy()
         url = '/chatroom/whitelist/add.json'
         format_str = '{% for item in obj_names %}objectnames={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -412,7 +412,7 @@ class MessageWhileList(Module):
         删除聊天室消息白名单。
         :param obj_names: 消息标识，最多不超过 20 个。
         """
-        obj_names = self._tranlist(obj_names)
+        obj_names = self._tran_list(obj_names)
         param_dict = locals().copy()
         url = '/chatroom/whitelist/delete.json'
         format_str = '{% for item in obj_names %}objectnames={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
@@ -447,7 +447,7 @@ class UserWhileList(Module):
         """
         将用户添加到白名单中。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/whitelist/add.json'
         format_str = 'chatroomId={{ room_id }}' \
@@ -465,7 +465,7 @@ class UserWhileList(Module):
         """
         将用户从白名单中移除。
         """
-        user_ids = self._tranlist(user_ids)
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/chatroom/user/whitelist/remove.json'
         format_str = 'chatroomId={{ room_id }}' \

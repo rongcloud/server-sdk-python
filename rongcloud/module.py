@@ -82,7 +82,7 @@ class Module:
         return data
 
     @staticmethod
-    def _tranlist(param):
+    def _tran_list(param):
         if type(param) is str:
             return [param]
         return param

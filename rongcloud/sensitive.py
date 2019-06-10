@@ -38,7 +38,7 @@ class Sensitive(Module):
         删除敏感词。
         :param keywords: 敏感词或敏感词列表，最多不超过 50 个敏感词。
         """
-        keywords = self._tranlist(keywords)
+        keywords = self._tran_list(keywords)
         param_dict = locals().copy()
         url = '/sensitiveword/batch/delete.json'
         format_str = '{% for item in keywords %}words={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'

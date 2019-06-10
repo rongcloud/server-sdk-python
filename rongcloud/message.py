@@ -46,7 +46,7 @@ class Private(Module):
                            0 表示为不计数、 1 表示为计数，默认为 1 计数，未读消息数增加 1。
         :param is_include_sender: 发送用户自已是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。
         """
-        to_user_ids = self._tranlist(to_user_ids)
+        to_user_ids = self._tran_list(to_user_ids)
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
         url = '/message/private/publish.json'
@@ -122,7 +122,7 @@ class Private(Module):
             push_content = []
         if push_data is None:
             push_data = []
-        to_user_ids = self._tranlist(to_user_ids)
+        to_user_ids = self._tran_list(to_user_ids)
         content = json.dumps(content).replace('\"', '\\"')
         param_dict = locals().copy()
         url = '/message/private/publish_template.json'
