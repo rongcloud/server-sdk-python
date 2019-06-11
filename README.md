@@ -5,3 +5,8 @@
 ```
 $ sudo pip3 install jinja2
 ```
+
+### pip 安装方式
+```
+$ pip install rc-server-sdk
+```
