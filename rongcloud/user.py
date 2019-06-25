@@ -180,8 +180,8 @@ class Tag(Module):
         if len(user_ids) == 1:
             url = '/user/tag/set.json'
             format_str = '{' \
-                         '"userId":"{{ user_id }}",' \
-                         '"tags":"[{% for item in tags %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],"' \
+                         '"userId":"{{ user_ids[0] }}",' \
+                         '"tags":[{% for item in tags %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
                          '}'
             try:
                 for user in user_ids:
@@ -211,7 +211,7 @@ class Tag(Module):
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
-        url = '/user/tag/get.json'
+        url = '/user/tags/get.json'
         format_str = '{% for item in user_ids %}userIds={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
         try:
             self._check_param(user_ids, list, '1-50')

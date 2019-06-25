@@ -1,4 +1,3 @@
-import json
 import unittest
 
 from rongcloud.rongcloud import RongCloud

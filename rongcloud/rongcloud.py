@@ -2,6 +2,7 @@ from rongcloud.chatroom import Chatroom
 from rongcloud.conversation import Conversation
 from rongcloud.group import Group
 from rongcloud.message import Message
+from rongcloud.push import Push
 from rongcloud.sensitive import Sensitive
 from rongcloud.user import User
 
@@ -43,3 +44,6 @@ class RongCloud:
 
     def get_sensitive(self):
         return Sensitive(self)
+
+    def get_push(self):
+        return Push(self)

@@ -19,5 +19,6 @@ class ConversationTestCase(unittest.TestCase):
         rep = rc.get_conversation().unmute(Conversation.CONVERSATION_PRIVATE, user_id, target_id)
         self.assertEqual(rep['code'], 200, rep)
 
+
 if __name__ == '__main__':
     unittest.main()

@@ -46,11 +46,27 @@ class UserTestCase(unittest.TestCase):
         target = 'AAA'
         # target = ['AAA', 'BBB']
         rep = rc.get_user().get_block().remove(target)
-        print(target)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_block_query(self):
         rep = rc.get_user().get_block().query()
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_tag_set(self):
+        user_id = '31232'
+        tags = ['bj', '男']
+        rep = rc.get_user().get_tag().set(user_id, tags)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_tag_set_batch(self):
+        user_id = ['id1', 'id2']
+        tags = ['bj', '男']
+        rep = rc.get_user().get_tag().set(user_id, tags)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_tag_get(self):
+        user_ids = ['id1', 'id2']
+        rep = rc.get_user().get_tag().get(user_ids)
         self.assertEqual(rep['code'], 200, rep)
 
 
