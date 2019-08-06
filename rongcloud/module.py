@@ -12,6 +12,7 @@ HEADER_APP_KEY = 'App-Key'
 HEADER_NONCE = 'Nonce'
 HEADER_TIMESTAMP = 'Timestamp'
 HEADER_SIGNATURE = 'Signature'
+HEADER_USER_AGENT = 'User-Agent'
 HEADER_CONTENT_TYPE = 'Content-Type'
 
 
@@ -37,7 +38,8 @@ class Module:
         return {HEADER_APP_KEY: self._rc.app_key,
                 HEADER_NONCE: nonce,
                 HEADER_TIMESTAMP: timestamp,
-                HEADER_SIGNATURE: signature}
+                HEADER_SIGNATURE: signature,
+                HEADER_USER_AGENT: 'rc-python-sdk/3.0.0'}
 
     def _http_post(self, url, data=''):
         data = '{}'.encode('utf-8') if data is None else data.encode('utf-8')
