@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rc-server-sdk",
-    version="3.0.2",
+    version="3.0.3",
     author="zhanglei1",
     author_email="zhanglei1@rongcloud.cn",
     description="rongcloud python server sdk",

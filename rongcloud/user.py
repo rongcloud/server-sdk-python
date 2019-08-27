@@ -20,7 +20,7 @@ class User(Module):
         param_dict = locals().copy()
         url = '/user/getToken.json'
         format_str = 'userId={{ user_id }}' \
-                     '&name ={{ name }}' \
+                     '&name={{ name }}' \
                      '&portraitUri={{ portrait_uri }}'
         try:
             self._check_param(user_id, str, '1-64')
