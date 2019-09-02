@@ -73,7 +73,7 @@ class Module:
         else:
             return
         if obj_range is not None:
-            rmin, rmax = obj_range.split('-')
+            rmin, rmax = obj_range.split('~')
             if obj_len < int(rmin) or obj_len > int(rmax):
                 raise ParamException('{{"code":1002, "msg":"{} 长度超限，应 >= {} 且 <= {}"}}'.format(obj, rmin, rmax))
 

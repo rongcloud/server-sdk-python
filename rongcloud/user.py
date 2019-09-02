@@ -7,9 +7,6 @@ class User(Module):
     def __init__(self, rc):
         super().__init__(rc)
 
-    def get_tag(self):
-        return Tag(self._rc)
-
     def register(self, user_id, name='', portrait_uri=''):
         """
         注册用户，生成用户在融云的唯一身份标识 Token，各端 SDK 使用 Token 连接融云服务器。
@@ -53,8 +50,14 @@ class User(Module):
     def get_blacklist(self):
         return Blacklist(self._rc)
 
+    def get_whitelist(self):
+        return Whitelist(self.rc)
+
     def get_block(self):
         return Block(self._rc)
+
+    def get_tag(self):
+        return Tag(self._rc)
 
 
 class Blacklist(Module):
@@ -65,7 +68,7 @@ class Blacklist(Module):
         """
         将对方加入黑名单，屏蔽对方消息，但自己仍可给对方发送消息，应用中每个用户均可设置自己的黑名单。
         :param user_id: 用户 ID。
-        :param black_ids: 被设置为黑名单的用户 ID 或 ID 列表。
+        :param black_ids: 被设置为黑名单的用户 ID 或 ID 列表，每次最多添加 20 个。
         """
         black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
@@ -74,7 +77,7 @@ class Blacklist(Module):
                      '{% for item in black_ids %}&blackUserId={{ item }}{% endfor %}'
         try:
             self._check_param(user_id, str, '1-64')
-            self._check_param(black_ids, list)
+            self._check_param(black_ids, list, '1-20')
             for user in black_ids:
                 self._check_param(user, str, '1-64')
             return self._http_post(url, self._render(param_dict, format_str))
@@ -85,7 +88,7 @@ class Blacklist(Module):
         """
         将用户从黑名单中移除。
         :param user_id: 用户 ID。
-        :param black_ids: 被移除黑名单的用户 ID 或 ID 列表。
+        :param black_ids: 被移除黑名单的用户 ID 或 ID 列表，每次最多添加 20 个。
         """
         black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
@@ -94,7 +97,7 @@ class Blacklist(Module):
                      '{% for item in black_ids %}&blackUserId={{ item }}{% endfor %}'
         try:
             self._check_param(user_id, str, '1-64')
-            self._check_param(black_ids, list)
+            self._check_param(black_ids, list, '1-20')
             for user in black_ids:
                 self._check_param(user, str, '1-64')
             return self._http_post(url, self._render(param_dict, format_str))
@@ -108,6 +111,68 @@ class Blacklist(Module):
         """
         param_dict = locals().copy()
         url = '/user/blacklist/query.json'
+        format_str = 'userId={{ user_id }}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+
+class Whitelist(Module):
+    """
+    应用中对用户之间相互发送消息有限制要求的客户，可使用用户白名单功能，将用户加入白名单后，才能收到该用户发送的单聊消息。
+    """
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, user_id, white_ids):
+        """
+        添加用户到白名单。
+        :param user_id: 用户 ID。
+        :param white_ids: 被设置为白名单的用户 ID 或 ID 列表，每次最多添加 20 个。
+        """
+        white_ids = self._tran_list(white_ids)
+        param_dict = locals().copy()
+        url = '/user/whitelist/add.json'
+        format_str = 'userId={{ user_id }}' \
+                     '{% for item in white_ids %}&whiteUserId={{ item }}{% endfor %}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(white_ids, list, '1-20')
+            for user in white_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, user_id, white_ids):
+        """
+        移除白名单中用户。
+        :param user_id: 用户 ID。
+        :param white_ids: 被移除白名单的用户 ID 或 ID 列表，每次最多添加 20 个。
+        """
+        white_ids = self._tran_list(white_ids)
+        param_dict = locals().copy()
+        url = '/user/whitelist/remove.json'
+        format_str = 'userId={{ user_id }}' \
+                     '{% for item in white_ids %}&whiteUserId={{ item }}{% endfor %}'
+        try:
+            self._check_param(user_id, str, '1-64')
+            self._check_param(white_ids, list, '1-20')
+            for user in white_ids:
+                self._check_param(user, str, '1-64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self, user_id):
+        """
+        获取某用户白名单列表。
+        :param user_id: 用户 ID。
+        """
+        param_dict = locals().copy()
+        url = '/user/whitelist/query.json'
         format_str = 'userId={{ user_id }}'
         try:
             self._check_param(user_id, str, '1-64')
