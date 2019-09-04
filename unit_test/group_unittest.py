@@ -36,16 +36,25 @@ class GroupTestCase(unittest.TestCase):
         self.assertEqual(rep['code'], 200, rep)
 
     def test_join(self):
-        user_id_list = ['1', '2']
+        user_id = '1'
         group_id = '123'
         group_name = 'TestGroup'
-        rep = rc.get_group().join(user_id_list, group_id, group_name)
+        rep = rc.get_group().join(user_id, group_id, group_name)
+        self.assertEqual(rep['code'], 200, rep)
+        user_ids = ['1', '2']
+        group_id = '123'
+        group_name = 'TestGroup'
+        rep = rc.get_group().join(user_ids, group_id, group_name)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_quit(self):
-        user_id_list = ['1', '2']
+        user_id = '1'
         group_id = '123'
-        rep = rc.get_group().quit(user_id_list, group_id)
+        rep = rc.get_group().quit(user_id, group_id)
+        self.assertEqual(rep['code'], 200, rep)
+        user_ids = ['1', '2']
+        group_id = '123'
+        rep = rc.get_group().quit(user_ids, group_id)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_dismiss(self):
@@ -54,22 +63,55 @@ class GroupTestCase(unittest.TestCase):
         rep = rc.get_group().dismiss(user_id, group_id)
         self.assertEqual(rep['code'], 200, rep)
 
-    def test_gag_add(self):
-        user_id_list = ['2582', '2583']
+    def test_usergag_add(self):
+        user_id = '2582'
         group_id = '16'
         minute = 1
-        rep = rc.get_group().get_gag().add(user_id_list, group_id, minute)
+        rep = rc.get_group().get_usergag().add(user_id, group_id, minute)
+        self.assertEqual(rep['code'], 200, rep)
+        user_ids = ['2582', '2583']
+        group_id = '16'
+        minute = 1
+        rep = rc.get_group().get_usergag().add(user_ids, group_id, minute)
         self.assertEqual(rep['code'], 200, rep)
 
-    def test_gag_remove(self):
-        user_id_list = ['2582', '2583']
+    def test_usergag_remove(self):
+        user_id = '2582'
         group_id = '16'
-        rep = rc.get_group().get_gag().remove(user_id_list, group_id)
+        rep = rc.get_group().get_usergag().remove(user_id, group_id)
+        self.assertEqual(rep['code'], 200, rep)
+        user_ids = ['2582', '2583']
+        group_id = '16'
+        rep = rc.get_group().get_usergag().remove(user_ids, group_id)
         self.assertEqual(rep['code'], 200, rep)
 
-    def test_gag_query(self):
+    def test_usergag_query(self):
         group_id = '16'
-        rep = rc.get_group().get_gag().query(group_id)
+        rep = rc.get_group().get_usergag().query(group_id)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_ban_add(self):
+        group_id = '16'
+        rep = rc.get_group().get_ban().add(group_id)
+        self.assertEqual(rep['code'], 200, rep)
+        group_ids = ['16', '19']
+        rep = rc.get_group().get_ban().add(group_ids)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_ban_remove(self):
+        group_id = '16'
+        rep = rc.get_group().get_ban().remove(group_id)
+        self.assertEqual(rep['code'], 200, rep)
+        group_ids = ['16', '19']
+        rep = rc.get_group().get_ban().remove(group_ids)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_ban_query(self):
+        group_id = '16'
+        rep = rc.get_group().get_ban().query(group_id)
+        self.assertEqual(rep['code'], 200, rep)
+        group_ids = ['16', '19']
+        rep = rc.get_group().get_ban().query(group_ids)
         self.assertEqual(rep['code'], 200, rep)
 
 

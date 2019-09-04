@@ -40,7 +40,7 @@ class Group(Module):
         """
         创建群组，并将用户加入该群组，用户将可以收到该群的消息，每个群最大至 3000 人，App 内的群组数量没有限制。
         注：其实本方法是加入群组方法。
-        :param user_ids:            加入群组的用户或用户列表。
+        :param user_ids:            加入群组的用户 Id 或用户 Id 列表。
         :param group_id:            创建群组 Id。（必传）
         :param group_name:          群组 Id 对应的名称，用于在发送群组消息显示远程 Push 通知时使用，
                                     如群组名称改变需要调用刷新群组信息接口同步。（必传）
@@ -63,156 +63,250 @@ class Group(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def query(self, group_id):
+    def join(self, user_ids, group_id, group_name):
         """
-        获取群信息。
-        :param group_id: 群组 Id。
+        将用户加入指定群组，用户将可以收到该群的消息，每个群最大至 3000 人。
+        :param user_ids:            要加入群的用户 Id 或 Id 列表，可提交多个，最多不超过 1000 个。（必传）
+        :param group_id:            要加入的群 Id。（必传）
+        :param group_name:          要加入的群 Id 对应的名称。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
         """
-        param_dict = locals().copy()
-        url = '/group/user/query.json'
-        format_str = 'groupId={{ group_id }}'
-        try:
-            self._check_param(group_id, str, '1-64')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-    def update(self, group_id, group_name):
-        """
-        修改群信息。
-        :param group_id: 群组 Id。
-        :param group_name: 群组新名称。
-        """
-        param_dict = locals().copy()
-        url = '/group/refresh.json'
-        format_str = 'groupId={{ group_id }}' \
-                     '&groupName={{ group_name }}'
-        try:
-            self._check_param(group_id, str, '1-64')
-            self._check_param(group_name, str, '1-64')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-    def join(self, user_id_list, group_id, group_name):
-        """
-        加入群组。
-        :param user_id_list: 加入群组的用户列表。
-        :param group_id: 群组 Id，最大长度 64 个字符，建议使用 英文字母、数字 混排。
-        :param group_name: 群组名称，最大长度 64 个字符。
-        """
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/group/join.json'
-        format_str = '{% for item in user_id_list %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
                      '&groupId={{ group_id }}' \
                      '&groupName={{ group_name }}'
         try:
-            self._check_param(user_id_list, list)
-            for user_id in user_id_list:
-                self._check_param(user_id, str, '1-64')
-            self._check_param(group_id, str, '1-64')
-            self._check_param(group_name, str, '1-64')
+            self._check_param(user_ids, list, '1~1000')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
+            self._check_param(group_name, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
-    def quit(self, user_id_list, group_id):
+    def quit(self, user_ids, group_id):
         """
-        退出群组。
-        :param user_id_list: 要退出群组的用户列表。
-        :param group_id: 群组 Id。
+        将用户从群中移除，不再接收该群组的消息。
+        :param user_ids:            要退出群的用户 Id 或 Id 列表。（必传）
+        :param group_id:            要退出的群 Id。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
         """
+        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
         url = '/group/quit.json'
-        format_str = '{% for item in user_id_list %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
                      '&groupId={{ group_id }}'
         try:
-            self._check_param(user_id_list, list)
-            for user_id in user_id_list:
-                self._check_param(user_id, str, '1-64')
-            self._check_param(group_id, str, '1-64')
+            self._check_param(user_ids, list, '1~1000')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
     def dismiss(self, user_id, group_id):
         """
-        解散群组。
-        :param user_id: 操作解散群的用户 Id。
-        :param group_id: 群组 Id。
+        将该群解散，所有用户都无法再接收该群的消息。
+        :param user_id:             操作解散群的用户 Id，可以为任何用户 Id ，非群组创建者也可以解散群组。（必传）
+        :param group_id:            要解散的群 Id。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/group/dismiss.json'
         format_str = 'userId={{ user_id }}' \
                      '&groupId={{ group_id }}'
         try:
-            self._check_param(user_id, str, '1-64')
+            self._check_param(user_id, str, '1~64')
             self._check_param(group_id, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
-    def get_gag(self):
-        return Gag(self._rc)
-
-
-class Gag(Module):
-    def __init__(self, rc):
-        super().__init__(rc)
-
-    def add(self, user_ids, group_id, minute):
+    def update(self, group_id, group_name):
         """
-        添加群组禁言，禁止群成员在群内发送消息，禁言后只能接收消息。
-        :param user_ids: 禁言群成员 ID 或 ID 列表。
-        :param group_id: 群组 ID。
-        :param minute: 禁言时长，以分钟为单位，最大值为43200分钟。
+        刷新群组信息。
+        :param group_id:            群组 Id。（必传）
+        :param group_name:          群组名称。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
         """
-        user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
-        url = '/group/user/gag/add.json'
-        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
-                     '&groupId={{ group_id }}' \
-                     '&minute={{ minute }}'
+        url = '/group/refresh.json'
+        format_str = 'groupId={{ group_id }}' \
+                     '&groupName={{ group_name }}'
         try:
-            self._check_param(user_ids, list)
-            for user_id in user_ids:
-                self._check_param(user_id, str, '1-64')
-            self._check_param(group_id, str, '1-64')
-            self._check_param(minute, int, '0-43200')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-    def remove(self, user_ids, group_id):
-        """
-        解除禁言。
-        :param user_ids: 解除禁言群成员 ID 或 ID 列表。
-        :param group_id: 群组 ID。
-        """
-        user_ids = self._tran_list(user_ids)
-        param_dict = locals().copy()
-        url = '/group/user/gag/rollback.json'
-        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
-                     '&groupId={{ group_id }}'
-        try:
-            self._check_param(user_ids, list)
-            for user_id in user_ids:
-                self._check_param(user_id, str, '1-64')
-            self._check_param(group_id, str, '1-64')
+            self._check_param(group_id, str, '1~64')
+            self._check_param(group_name, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
     def query(self, group_id):
         """
-        查询禁言成员列表。
-        :param group_id: 群组 ID。
+        查询群成员。
+        :param group_id:            群 Id。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常；users 群成员数组；id 群成员 ID。
+                                    如：{"code":200,"users":[{"id":"10001"},{"id":"10002"},{"id":"10000"},{"id":"10003"}]}
+        """
+        param_dict = locals().copy()
+        url = '/group/user/query.json'
+        format_str = 'groupId={{ group_id }}'
+        try:
+            self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def get_usergag(self):
+        return UserGag(self._rc)
+
+    def get_ban(self):
+        return Ban(self._rc)
+
+
+class UserGag(Module):
+    """
+    如果不想让某一用户在群中发言时，可将此用户在群组中禁言，被禁言用户可以接收查看群组中用户聊天信息，但不能通过客户端 SDK 发送消息。
+    提示：被禁言用户通过 Server API 发送的消息权限级别较高，不受禁言限制。
+    """
+
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, user_ids, group_id, minute):
+        """
+        添加禁言群成员。
+        :param user_ids:            用户 Id 或 Id 列表，每次最多设置 20 个用户。（必传）
+        :param group_id:            群组 Id，为空时则设置用户在加入的所有群组中都不能发送消息。（非必传）
+        :param minute:              禁言时长，以分钟为单位，最大值为 43200 分钟，为 0 表示永久禁言。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/group/user/gag/add.json'
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+                     '{% if group_id is not none %}groupId={{ group_id }}{% endif %}' \
+                     '&minute={{ minute }}'
+        try:
+            self._check_param(user_ids, list, '1~20')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
+            self._check_param(minute, int, '0~43200')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, user_ids, group_id):
+        """
+        移除禁言群成员。
+        :param user_ids:            用户 Id 或 Id 列表，每次最多设置 20 个用户。（必传）
+        :param group_id:            群组 Id，为空时则移除用户在所有群组中的禁言设置。（非必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/group/user/gag/rollback.json'
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+                     '{% if group_id is not none %}groupId={{ group_id }}{% endif %}'
+        try:
+            self._check_param(user_ids, list, '1~20')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self, group_id):
+        """
+        查询被禁言群成员。
+        :param group_id:            群组 Id，为空时则获取所有群组禁言用户列表。（非必传）
+        :return                     请求返回结果，code 返回码，200 为正常；time 解禁时间；userId 群成员 Id。
+                                    如：{"code":200,"users":[{"time":"2015-09-25 16:12:38","userId":"2582"}]}
         """
         param_dict = locals().copy()
         url = '/group/user/gag/list.json'
-        format_str = 'groupId={{ group_id }}'
+        format_str = '{% if group_id is not none %}groupId={{ group_id }}{% endif %}'
         try:
             self._check_param(group_id, str)
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+
+class Ban(Module):
+    """
+    设置某一群组全部成员禁言，如果在群组全部成员禁言状态下，需要某些用户可以发言时，可将此用户加入到群禁言用户白名单中。
+    """
+
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, group_ids):
+        """
+        添加禁言群。
+        :param group_ids:           群组 Id 或 Id 列表，，支持一次设置多个，最多不超过 20 个。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
+        """
+        group_ids = self._tran_list(group_ids)
+        param_dict = locals().copy()
+        url = '/group/ban/add.json'
+        format_str = '{% for item in group_ids %}{% if not loop.first %}&{% endif %}groupId={{ item }}{% endfor %}'
+        try:
+            self._check_param(group_ids, list, '1~20')
+            for group_id in group_ids:
+                self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, group_ids):
+        """
+        移除禁言群。
+        :param group_ids:           群组 Id 或 Id 列表，，支持一次设置多个，最多不超过 20 个。（必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
+        """
+        group_ids = self._tran_list(group_ids)
+        param_dict = locals().copy()
+        url = '/group/ban/rollback.json'
+        format_str = '{% for item in group_ids %}{% if not loop.first %}&{% endif %}groupId={{ item }}{% endfor %}'
+        try:
+            self._check_param(group_ids, list, '1~20')
+            for group_id in group_ids:
+                self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self, group_ids):
+        """
+        查询被禁言群。
+        :param group_ids:           群组 Id 或 Id 列表，不传此参数，表示查询所有设置禁言的群组列表；
+                                    传此参数时，表示查询传入的群组 Id 是否被设置为群组禁言，
+                                    支持一次查询多个，最多不超过 20 个。（非必传）
+        :return                     请求返回结果，code 返回码，200 为正常。
+                                    如：{"code":200}
+        """
+        group_ids = self._tran_list(group_ids)
+        param_dict = locals().copy()
+        url = '/group/ban/query.json'
+        format_str = '{% for item in group_ids %}{% if not loop.first %}&{% endif %}groupId={{ item }}{% endfor %}'
+        try:
+            self._check_param(group_ids, list, '1~20')
+            for group_id in group_ids:
+                self._check_param(group_id, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
