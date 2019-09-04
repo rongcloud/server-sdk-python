@@ -56,7 +56,7 @@ class Private(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0（可选）
-        :return:                    请求返回结果。
+        :return                     请求返回结果。
         """
         to_user_ids = self._tran_list(to_user_ids)
         content = urllib.parse.quote(json.dumps(content))
@@ -103,7 +103,7 @@ class Private(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果。
+        :return                     请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -232,7 +232,7 @@ class Group(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果。
+        :return                     请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -293,7 +293,7 @@ class Chatroom(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果。
+        :return                     请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -327,7 +327,7 @@ class Chatroom(Module):
                                     以避免与融云系统内置消息的 ObjectName 重名。（必传）
         :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
-        :return:                    请求返回结果。
+        :return                     请求返回结果。
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()

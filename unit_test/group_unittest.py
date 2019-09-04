@@ -13,10 +13,15 @@ class GroupTestCase(unittest.TestCase):
         self.assertEqual(rep['code'], 200, rep)
 
     def test_create(self):
-        user_id_list = ['1', '2']
-        group_id = '123'
+        user_ids = 'user_1'
+        group_id = 'group_test'
         group_name = 'TestGroup'
-        rep = rc.get_group().create(user_id_list, group_id, group_name)
+        rep = rc.get_group().create(user_ids, group_id, group_name)
+        self.assertEqual(rep['code'], 200, rep)
+        user_ids = ['user_2', 'user_3']
+        group_id = 'group_test'
+        group_name = 'TestGroup'
+        rep = rc.get_group().create(user_ids, group_id, group_name)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_query(self):

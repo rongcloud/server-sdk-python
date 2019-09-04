@@ -8,19 +8,22 @@ rc = RongCloud('8luwapkvucoil', 'y0icysjl4h3LWz')
 
 class SensitiveTestCase(unittest.TestCase):
     def test_add(self):
-        keyword = '我们'
-        replace = '你们'
-        rep = rc.get_sensitive().add(keyword, replace)
+        word = '我们'
+        replace_word = '你们'
+        rep = rc.get_sensitive().add(word, replace_word)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_remove(self):
-        keyword = ['我们', '他们']
-        rep = rc.get_sensitive().remove(keyword)
+        words = ['我们', '他们']
+        rep = rc.get_sensitive().remove(words)
+        self.assertEqual(rep['code'], 200, rep)
+        words = '我们'
+        rep = rc.get_sensitive().remove(words)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_query(self):
-        type = Sensitive.SENSITIVE_ALL
-        rep = rc.get_sensitive().query(type)
+        word_type = Sensitive.SENSITIVE_ALL
+        rep = rc.get_sensitive().query(word_type)
         self.assertEqual(rep['code'], 200, rep)
 
 

@@ -33,8 +33,8 @@ class Module:
     def _signature(self):
         nonce = str(random.randint(0, 1000000000))
         timestamp = str(int(time.time()))
-        tosha1 = (self._rc.app_secret + nonce + timestamp).encode('utf8')
-        signature = hashlib.sha1(tosha1).hexdigest()
+        sha1 = (self._rc.app_secret + nonce + timestamp).encode('utf8')
+        signature = hashlib.sha1(sha1).hexdigest()
         return {HEADER_APP_KEY: self._rc.app_key,
                 HEADER_NONCE: nonce,
                 HEADER_TIMESTAMP: timestamp,
@@ -42,6 +42,7 @@ class Module:
                 HEADER_USER_AGENT: 'rc-python-sdk/3.0.0'}
 
     def _http_post(self, url, data=''):
+        print('post_body:' + data)
         data = '{}'.encode('utf-8') if data is None else data.encode('utf-8')
         headers = self._signature()
         try:
@@ -73,9 +74,9 @@ class Module:
         else:
             return
         if obj_range is not None:
-            rmin, rmax = obj_range.split('~')
-            if obj_len < int(rmin) or obj_len > int(rmax):
-                raise ParamException('{{"code":1002, "msg":"{} 长度超限，应 >= {} 且 <= {}"}}'.format(obj, rmin, rmax))
+            r_min, r_max = obj_range.split('~')
+            if obj_len < int(r_min) or obj_len > int(r_max):
+                raise ParamException('{{"code":1002, "msg":"{} 长度超限，应 >= {} 且 <= {}"}}'.format(obj, r_min, r_max))
 
     @staticmethod
     def _render(params, format_str):
