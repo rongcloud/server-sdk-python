@@ -15,7 +15,7 @@ class Conversation(Module):
     def __init__(self, rc):
         super().__init__(rc)
 
-    def mute(self, type, user_id, target_id):
+    def mute(self, mute_type, user_id, target_id):
         """
         设置用户某个会话屏蔽 Push。
         """
@@ -26,9 +26,9 @@ class Conversation(Module):
                      '&targetId={{ target_id }}' \
                      '&isMuted=1'
         try:
-            self._check_param(type, int)
-            self._check_param(user_id, str, '1-64')
-            self._check_param(target_id, str, '1-64')
+            self._check_param(mute_type, int)
+            self._check_param(user_id, str, '1~64')
+            self._check_param(target_id, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -45,8 +45,8 @@ class Conversation(Module):
                      '&isMuted=0'
         try:
             self._check_param(type, int)
-            self._check_param(user_id, str, '1-64')
-            self._check_param(target_id, str, '1-64')
+            self._check_param(user_id, str, '1~64')
+            self._check_param(target_id, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))

@@ -18,9 +18,8 @@ class Group(Module):
         此接口主要为防止应用中用户群信息同融云已知的用户所属群信息不同步。
         :param user_id:             被同步群信息的用户 Id。（必传）
         :param group_info_list:     该用户所属的群信息，如群 Id 已经存在，则不会刷新对应群组名称，
-                                    如果想刷新群组名称请调用刷新群组信息方法。此参数可传多个，如：[('id', 'name'), ...]。
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+                                    如果想刷新群组名称请调用刷新群组信息方法。此参数可传多个，如：[('id', 'name'), ...]。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/group/sync.json'
@@ -44,8 +43,7 @@ class Group(Module):
         :param group_id:            创建群组 Id。（必传）
         :param group_name:          群组 Id 对应的名称，用于在发送群组消息显示远程 Push 通知时使用，
                                     如群组名称改变需要调用刷新群组信息接口同步。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -69,8 +67,7 @@ class Group(Module):
         :param user_ids:            要加入群的用户 Id 或 Id 列表，可提交多个，最多不超过 1000 个。（必传）
         :param group_id:            要加入的群 Id。（必传）
         :param group_name:          要加入的群 Id 对应的名称。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -93,8 +90,7 @@ class Group(Module):
         将用户从群中移除，不再接收该群组的消息。
         :param user_ids:            要退出群的用户 Id 或 Id 列表。（必传）
         :param group_id:            要退出的群 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -115,8 +111,7 @@ class Group(Module):
         将该群解散，所有用户都无法再接收该群的消息。
         :param user_id:             操作解散群的用户 Id，可以为任何用户 Id ，非群组创建者也可以解散群组。（必传）
         :param group_id:            要解散的群 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/group/dismiss.json'
@@ -134,8 +129,7 @@ class Group(Module):
         刷新群组信息。
         :param group_id:            群组 Id。（必传）
         :param group_name:          群组名称。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/group/refresh.json'
@@ -152,7 +146,7 @@ class Group(Module):
         """
         查询群成员。
         :param group_id:            群 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；users 群成员数组；id 群成员 ID。
+        :return:                    请求返回结果，code 返回码，200 为正常；users 群成员数组；id 群成员 ID。
                                     如：{"code":200,"users":[{"id":"10001"},{"id":"10002"},{"id":"10000"},{"id":"10003"}]}
         """
         param_dict = locals().copy()
@@ -186,8 +180,7 @@ class UserGag(Module):
         :param user_ids:            用户 Id 或 Id 列表，每次最多设置 20 个用户。（必传）
         :param group_id:            群组 Id，为空时则设置用户在加入的所有群组中都不能发送消息。（非必传）
         :param minute:              禁言时长，以分钟为单位，最大值为 43200 分钟，为 0 表示永久禁言。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -210,8 +203,7 @@ class UserGag(Module):
         移除禁言群成员。
         :param user_ids:            用户 Id 或 Id 列表，每次最多设置 20 个用户。（必传）
         :param group_id:            群组 Id，为空时则移除用户在所有群组中的禁言设置。（非必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -231,7 +223,7 @@ class UserGag(Module):
         """
         查询被禁言群成员。
         :param group_id:            群组 Id，为空时则获取所有群组禁言用户列表。（非必传）
-        :return                     请求返回结果，code 返回码，200 为正常；time 解禁时间；userId 群成员 Id。
+        :return:                    请求返回结果，code 返回码，200 为正常；time 解禁时间；userId 群成员 Id。
                                     如：{"code":200,"users":[{"time":"2015-09-25 16:12:38","userId":"2582"}]}
         """
         param_dict = locals().copy()
@@ -256,8 +248,7 @@ class Ban(Module):
         """
         添加禁言群。
         :param group_ids:           群组 Id 或 Id 列表，，支持一次设置多个，最多不超过 20 个。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         group_ids = self._tran_list(group_ids)
         param_dict = locals().copy()
@@ -275,8 +266,7 @@ class Ban(Module):
         """
         移除禁言群。
         :param group_ids:           群组 Id 或 Id 列表，，支持一次设置多个，最多不超过 20 个。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         group_ids = self._tran_list(group_ids)
         param_dict = locals().copy()
@@ -296,8 +286,7 @@ class Ban(Module):
         :param group_ids:           群组 Id 或 Id 列表，不传此参数，表示查询所有设置禁言的群组列表；
                                     传此参数时，表示查询传入的群组 Id 是否被设置为群组禁言，
                                     支持一次查询多个，最多不超过 20 个。（非必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         group_ids = self._tran_list(group_ids)
         param_dict = locals().copy()

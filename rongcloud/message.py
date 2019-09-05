@@ -56,7 +56,7 @@ class Private(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0（可选）
-        :return                     请求返回结果。
+        :return:                    请求返回结果。
         """
         to_user_ids = self._tran_list(to_user_ids)
         content = urllib.parse.quote(json.dumps(content))
@@ -103,7 +103,7 @@ class Private(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return                     请求返回结果。
+        :return:                    请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -116,8 +116,8 @@ class Private(Module):
                      '{% if is_delete is not none %}&isDelete={{ is_delete }}{% endif %}' \
                      '{% if extra is not none %}&extra={{ extra }}{% endif %}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(target_id, str, '1-64')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(target_id, str, '1~64')
             self._check_param(uid, str)
             self._check_param(sent_time, int)
             self._check_param(is_admin, int)
@@ -164,17 +164,17 @@ class Private(Module):
                      '"contentAvailable":{{ content_available }}' \
                      '}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(to_user_ids, list, '1-1000')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_user_ids, list, '1~1000')
             for user in to_user_ids:
-                self._check_param(user, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+                self._check_param(user, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(values, list)
             self._check_param(push_content, list)
             self._check_param(push_data, list)
-            self._check_param(verify_blacklist, int, '0-1')
-            self._check_param(content_available, int, '0-1')
+            self._check_param(verify_blacklist, int, '0~1')
+            self._check_param(content_available, int, '0~1')
             xx = self._render(param_dict, format_str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
@@ -205,17 +205,17 @@ class Group(Module):
                      '&isMentioned={{ is_mentioned }}' \
                      '&contentAvailable={{ content_available }}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(to_group_id, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_group_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(push_content, str)
             self._check_param(push_data, str)
-            self._check_param(is_persisted, int, '0-1')
-            self._check_param(is_counted, int, '0-1')
-            self._check_param(is_include_sender, int, '0-1')
-            self._check_param(is_mentioned, int, '0-1')
-            self._check_param(content_available, int, '0-1')
+            self._check_param(is_persisted, int, '0~1')
+            self._check_param(is_counted, int, '0~1')
+            self._check_param(is_include_sender, int, '0~1')
+            self._check_param(is_mentioned, int, '0~1')
+            self._check_param(content_available, int, '0~1')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -232,7 +232,7 @@ class Group(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return                     请求返回结果。
+        :return:                    请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -245,8 +245,8 @@ class Group(Module):
                      '{% if is_delete is not none %}&isDelete={{ is_delete }}{% endif %}' \
                      '{% if extra is not none %}&extra={{ extra }}{% endif %}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(group_id, str, '1-64')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
             self._check_param(uid, str)
             self._check_param(sent_time, int)
             self._check_param(is_admin, int)
@@ -273,9 +273,9 @@ class Chatroom(Module):
                      '&objectName={{ object_name }}' \
                      '&content={{ content }}'
         try:
-            self._check_param(from_user_id, str, '1-64')
+            self._check_param(from_user_id, str, '1~64')
             self._check_param(to_chatroom_id, str)
-            self._check_param(object_name, str, '1-32')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
@@ -293,7 +293,7 @@ class Chatroom(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return                     请求返回结果。
+        :return:                    请求返回结果。
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -306,8 +306,8 @@ class Chatroom(Module):
                      '{% if is_delete is not none %}&isDelete={{ is_delete }}{% endif %}' \
                      '{% if extra is not none %}&extra={{ extra }}{% endif %}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(chatroom_id, str, '1-64')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(chatroom_id, str, '1~64')
             self._check_param(uid, str)
             self._check_param(sent_time, int)
             self._check_param(is_admin, int)
@@ -327,7 +327,7 @@ class Chatroom(Module):
                                     以避免与融云系统内置消息的 ObjectName 重名。（必传）
         :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
-        :return                     请求返回结果。
+        :return:                    请求返回结果。
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
@@ -336,8 +336,8 @@ class Chatroom(Module):
                      '&objectName={{ object_name }}' \
                      '&content={{ content }}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
@@ -361,15 +361,15 @@ class System(Module):
                      '&objectName={{ object_name }}' \
                      '&content={{ content }}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(to_user_id, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_user_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(push_content, str)
             self._check_param(push_data, str)
-            self._check_param(is_persisted, int, '0-1')
-            self._check_param(is_counted, int, '0-1')
-            self._check_param(content_available, int, '0-1')
+            self._check_param(is_persisted, int, '0~1')
+            self._check_param(is_counted, int, '0~1')
+            self._check_param(content_available, int, '0~1')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -397,16 +397,16 @@ class System(Module):
                      '"contentAvailable":{{ content_available }}' \
                      '}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(to_user_list, list, '1-1000')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_user_list, list, '1~1000')
             for user in to_user_list:
-                self._check_param(user, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+                self._check_param(user, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(values, list)
             self._check_param(push_content, list)
             self._check_param(push_data, list)
-            self._check_param(content_available, int, '0-1')
+            self._check_param(content_available, int, '0~1')
             xx = self._render(param_dict, format_str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
@@ -431,12 +431,12 @@ class Broadcast(Module):
                      '&pushData={{ push_data }}' \
                      '&contentAvailable={{ content_available }}'
         try:
-            self._check_param(from_user_id, str, '1-64')
-            self._check_param(object_name, str, '1-32')
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(push_content, str)
             self._check_param(push_data, str)
-            self._check_param(content_available, int, '0-1')
+            self._check_param(content_available, int, '0~1')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))

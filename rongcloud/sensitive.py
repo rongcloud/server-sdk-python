@@ -25,8 +25,7 @@ class Sensitive(Module):
                                     如未设置替换的敏感词，当消息中含有敏感词时，消息将被屏蔽，用户不会收到消息。
                                     如设置了替换敏感词，当消息中含有敏感词时，将被替换为指定的字符进行发送。
                                     敏感词替换目前只支持单聊、群聊、聊天室会话。
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/sensitiveword/add.json'
@@ -44,8 +43,7 @@ class Sensitive(Module):
         从敏感词列表中，移除某一敏感词，移除后 2 小时内生效。
         :param words:               敏感词或敏感词列表，敏感词最长不超过 32 个字符。（必传）
                                     一次最多移除敏感词不超过 50 个，移除后 2 小时内生效。
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         words = self._tran_list(words)
         param_dict = locals().copy()
@@ -74,7 +72,7 @@ class Sensitive(Module):
         """
         查询敏感词列表。
         :param word_type:           查询敏感词的类型，0 为查询替换敏感词，1 为查询屏蔽敏感词，2 为查询全部敏感词。默认为 1。（非必传）
-        :return                     请求返回结果，code 返回码，200 为正常；word 敏感词内容；
+        :return:                    请求返回结果，code 返回码，200 为正常；word 敏感词内容；
                                     replaceWord 替换敏感词的内容，为空时对应 Word 敏感词类型为屏蔽敏感词。
                                     如：{"code":200,"words":[{"type":"0","word":"黄赌毒","replaceWord":"***"},
                                     {"type":"1","word":"qqq","replaceWord":""}]}

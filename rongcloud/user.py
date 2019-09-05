@@ -23,7 +23,7 @@ class User(Module):
                                     重复的用户 Id 将被当作是同一用户。（必传）
         :param name:                用户名称，最大长度 128 字节。用来在 Push 推送时显示用户的名称。（必传）
         :param portrait_uri:        用户头像 URI，最大长度 1024 字节。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；
+        :return:                    请求返回结果，code 返回码，200 为正常；
                                     token 用户 Token，可以保存应用内，长度在 256 字节以内；
                                     userId 用户 Id，与输入的用户 Id 相同。
                                     如：{"code":200, "userId":"jlk456j5", "token":"sfd9823ihufi"}
@@ -50,7 +50,7 @@ class User(Module):
         :param name:                用户名称，最大长度 128 字节。用来在 Push 推送时，显示用户的名称，刷新用户名称后 5 分钟内生效。
                                     （可选，提供即刷新，不提供忽略）
         :param portrait_uri:        用户头像 URI，最大长度 1024 字节。用来在 Push 推送时显示。（可选，提供即刷新，不提供忽略）
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         param_dict = locals().copy()
@@ -70,7 +70,7 @@ class User(Module):
         """
         查询用户信息。
         :param user_id:             用户 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；userName 用户名称；userPortrait 用户头像地址。
+        :return:                    请求返回结果，code 返回码，200 为正常；userName 用户名称；userPortrait 用户头像地址。
                                     createTime 用户创建时间。
                                     如：{"code":200,"userName":"123","userPortrait":"","createTime":"2016-05-24 10:38:19"}
         """
@@ -87,7 +87,7 @@ class User(Module):
         """
         检查用户在线状态。
         :param user_id:             用户 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；status 在线状态，1为在线，0为不在线。
+        :return:                    请求返回结果，code 返回码，200 为正常；status 在线状态，1为在线，0为不在线。
                                     如：{"code":200,"status":"1"}
         """
         param_dict = locals().copy()
@@ -127,7 +127,7 @@ class Block(Module):
         封禁用户
         :param user_ids:            用户 Id，支持一次封禁多个用户，最多不超过 20 个。（必传）
         :param minute:              封禁时长，单位为分钟，最大值为43200分钟。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
@@ -148,7 +148,7 @@ class Block(Module):
         """
         解除用户封禁。
         :param user_ids:            用户 Id，支持一次解除多个用户，最多不超过 20 个。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
@@ -167,7 +167,7 @@ class Block(Module):
         """
         获取被封禁用户。
         :param                      无
-        :return                     请求返回结果，code 返回码，200 为正常；users 被封禁用户数组；userId 被封禁用户 ID；
+        :return:                    请求返回结果，code 返回码，200 为正常；users 被封禁用户数组；userId 被封禁用户 ID；
                                     blockEndTime 封禁结束时间。
                                     如：{"code":200,"users":[{"userId":"jlk456j5","blockEndTime":"2015-01-11 01:28:20"}]}
         """
@@ -189,7 +189,7 @@ class Blacklist(Module):
         添加用户到黑名单。
         :param user_id:             用户 Id。（必传）
         :param black_ids:           被加黑的用户 Id，每次最多添加 20 个用户。(必传)
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         black_ids = self._tran_list(black_ids)
@@ -211,7 +211,7 @@ class Blacklist(Module):
         移除黑名单中用户。
         :param user_id:             用户 Id。（必传）
         :param black_ids:           被移除的用户 Id，每次最多移除 20 个用户。(必传)
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         black_ids = self._tran_list(black_ids)
@@ -232,7 +232,7 @@ class Blacklist(Module):
         """
         获取某用户黑名单列表。
         :param user_id:             用户 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；users 黑名单用户数组。
+        :return:                    请求返回结果，code 返回码，200 为正常；users 黑名单用户数组。
                                     如：{"code":200,"users":["jlk454","jlk457"]}
         """
         param_dict = locals().copy()
@@ -258,7 +258,7 @@ class Whitelist(Module):
         添加用户到白名单。
         :param user_id:             用户 Id。（必传）
         :param white_ids:           被添加的用户 Id，每次最多添加 20 个用户。(必传)
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         white_ids = self._tran_list(white_ids)
@@ -280,7 +280,7 @@ class Whitelist(Module):
         移除白名单中用户。
         :param user_id:             用户 Id。（必传）
         :param white_ids:           被移除的用户 Id，每次最多移除 20 个用户。(必传)
-        :return                     请求返回结果，code 返回码，200 为正常。
+        :return:                    请求返回结果，code 返回码，200 为正常。
                                     如：{"code":200}
         """
         white_ids = self._tran_list(white_ids)
@@ -301,7 +301,7 @@ class Whitelist(Module):
         """
         获取某用户白名单列表。
         :param user_id:             用户 Id。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；users 白名单用户数组。
+        :return:                    请求返回结果，code 返回码，200 为正常；users 白名单用户数组。
                                     如：{"code":200,"users":["jlk454","jlk457"]}
         """
         param_dict = locals().copy()
@@ -324,8 +324,7 @@ class Tag(Module):
         :param user_ids:            用户 Id 或 Id 列表，一次最多支持 1000 个用户。（必传）
         :param tags:                用户标签，一个用户最多添加 20 个标签，每个 tag 最大不能超过 40 个字节，
                                     标签中不能包含特殊字符。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常。
-                                    如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -344,7 +343,8 @@ class Tag(Module):
         else:
             url = '/user/tag/batch/set.json'
             format_str = '{' \
-                         '"userIds":[{% for item in user_ids %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
+                         '"userIds":[{% for item in user_ids %}"{{ item }}"' \
+                         '{% if not loop.last %},{% endif %}{% endfor %}],' \
                          '"tags":[{% for item in tags %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
                          '}'
             try:
@@ -359,7 +359,7 @@ class Tag(Module):
         """
         查询用户所有标签功能，支持批量查询每次最多查询 50 个用户。
         :param user_ids:            用户 Id，一次最多支持 50 个用户。（必传）
-        :return                     请求返回结果，code 返回码，200 为正常；result 用户所有的标签数组。
+        :return:                    请求返回结果，code 返回码，200 为正常；result 用户所有的标签数组。
                                     如：{"code":200,"result":{"111":[],"222":["帅哥","北京"]}}
         """
         user_ids = self._tran_list(user_ids)
