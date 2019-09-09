@@ -89,9 +89,6 @@ class Chatroom(Module):
     def get_keep_alive(self):
         return KeepAlive(self._rc)
 
-    def get_user_while_list(self):
-        return UserWhileList(self._rc)
-
 
 class User(Module):
     def __init__(self, rc):
@@ -174,6 +171,9 @@ class User(Module):
 
     def get_block(self):
         return Block(self._rc)
+
+    def get_whitelist(self):
+        return WhileList(self._rc)
 
 
 class Gag(Module):
@@ -302,7 +302,6 @@ class Ban(Module):
                                     time 解禁时间；userId 被禁言用户 Id。
                                     如：{"code":200,"users":[{"time":"2015-09-25 16:12:38","userId":"2582"}]}
         """
-        param_dict = locals().copy()
         url = '/chatroom/user/ban/query.json'
         try:
             return self._http_post(url)
@@ -373,6 +372,76 @@ class Block(Module):
         """
         param_dict = locals().copy()
         url = '/chatroom/user/block/list.json'
+        format_str = 'chatroomId={{ room_id }}'
+        try:
+            self._check_param(room_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+
+class WhileList(Module):
+    """
+    现在聊天室中用户在离线 30 秒后或离线后聊天室中产生 30 条消息时会被自动踢出聊天室。
+    将用户加入到白名单后，用户将处于被保护状态，在以上情况下将不会被自动踢出聊天室。
+    白名单中用户在当前聊天室中发送消息的级别将高于 High Level 。聊天室销毁后，对应白名单也自动销毁。
+    此服务在开通 IM 商用版的情况下，可申请开通，详细请联系商务，电话：13161856839。
+    """
+
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, room_id, user_ids):
+        """
+        添加聊天室白名单成员。
+        :param room_id:             聊天室 Id。（必传）
+        :param user_ids:            聊天室中用户 Id，可提交多个，聊天室中白名单用户最多不超过 5 个。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/chatroom/user/whitelist/add.json'
+        format_str = 'chatroomId={{ room_id }}' \
+                     '{% for item in user_ids %}&userId={{ item }}{% endfor %}'
+        try:
+            self._check_param(room_id, str, '1~64')
+            self._check_param(user_ids, list, '1~5')
+            for user in user_ids:
+                self._check_param(user, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, room_id, user_ids):
+        """
+        移除聊天室白名单成员。
+        :param room_id:             聊天室 Id。（必传）
+        :param user_ids:            聊天室白名单中用户 Id，可提交多个，最多不超过 5 个。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/chatroom/user/whitelist/remove.json'
+        format_str = 'chatroomId={{ room_id }}' \
+                     '{% for item in user_ids %}&userId={{ item }}{% endfor %}'
+        try:
+            self._check_param(room_id, str, '1~64')
+            self._check_param(user_ids, list, '1~5')
+            for user in user_ids:
+                self._check_param(user, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self, room_id):
+        """
+        查询聊天室白名单成员。
+        :param room_id:             聊天室 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常；users 白名单用户数组。
+                                    如：{"code":200,"users":["user1","user2"]}
+        """
+        param_dict = locals().copy()
+        url = '/chatroom/user/whitelist/query.json'
         format_str = 'chatroomId={{ room_id }}'
         try:
             self._check_param(room_id, str, '1~64')
@@ -502,7 +571,7 @@ class WhileList(Module):
         try:
             self._check_param(obj_names, list, '1~20')
             for obj_name in obj_names:
-                self._check_param(obj_name, str, '1~64')
+                self._check_param(obj_name, str, '1~32')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -510,7 +579,8 @@ class WhileList(Module):
     def remove(self, obj_names):
         """
         删除聊天室消息白名单。
-        :param obj_names: 消息标识，最多不超过 20 个。
+        :param obj_names:           消息标识，最多不超过 20 个，自定义消息类型，长度不超过 32 个字符，参见内置消息类型表。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         obj_names = self._tran_list(obj_names)
         param_dict = locals().copy()
@@ -519,24 +589,29 @@ class WhileList(Module):
         try:
             self._check_param(obj_names, list, '1~20')
             for obj_name in obj_names:
-                self._check_param(obj_name, str, '1~64')
+                self._check_param(obj_name, str, '1~32')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
     def query(self):
         """
-        获取聊天室消息白名单。
+        查询聊天室消息白名单。
+        :return:                    请求返回结果，code 返回码，200 为正常；whitlistMsgType 消息类型数组。
+                                    如：{"code":200,"whitlistMsgType":["RC:ImgMsg","RC:ImgTextMsg","RC:VcMsg"]}
         """
         url = '/chatroom/whitelist/query.json'
-        return self._http_post(url)
+        try:
+            return self._http_post(url)
+        except ParamException as e:
+            return json.loads(str(e))
 
 
 class KeepAlive(Module):
     """
-    聊天室中 1 小时无人说话，同时没有人加入聊天室时，融云服务端会自动把聊天室内所有成员踢出并销毁聊天室。
-    如果不希望聊天室自动销毁，可用此接口将指定聊天室做保活处理，聊天室不会自动销毁。
-    此功能需开通专有云服务。
+    当聊天室中 1 小时无人说话，同时没有人加入聊天室时，融云服务端会自动把聊天室内所有成员踢出聊天室并销毁聊天室。
+    如果不希望聊天室自动销毁，可以使用此服务将指定聊天室进行保活处理，保活的聊天室不会被自动销毁，需要调用 API 接口销毁聊天室。
+    此服务在开通 IM 商用版的情况下，可申请开通，详细请联系商务，电话：13161856839。
     """
 
     def __init__(self, rc):
@@ -545,6 +620,8 @@ class KeepAlive(Module):
     def add(self, room_id):
         """
         添加保活聊天室。
+        :param room_id:             聊天室 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/chatroom/keepalive/add.json'
@@ -557,7 +634,9 @@ class KeepAlive(Module):
 
     def remove(self, room_id):
         """
-        删除保活聊天室。
+        移除保活聊天室。
+        :param room_id:             聊天室 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/chatroom/keepalive/remove.json'
@@ -570,70 +649,12 @@ class KeepAlive(Module):
 
     def query(self):
         """
-        获取保活聊天室。
+        查询保活聊天室。
+        :return:                    请求返回结果，code 返回码，200 为正常；chatroomIds 保活聊天室数组。
+                                    如：{"code":200,"chatroomIds":["1000","1001"]}
         """
-        param_dict = locals().copy()
         url = '/chatroom/keepalive/query.json'
-        return self._http_post(url)
-
-
-class UserWhileList(Module):
-    """
-    默认聊天室成员离线 30 秒后或离线后错过 30 条消息，会被踢出聊天室。
-    将用户加入白名单后，用户将处于被保护状态，在以上情况下将不会被踢出聊天室。
-    白名单中用户在当前聊天室中发送消息的级别将高于 High Level。
-    聊天室销毁后，对应白名单也自动销毁。
-    此功能需开通专有云服务。
-    """
-
-    def __init__(self, rc):
-        super().__init__(rc)
-
-    def add(self, room_id, user_ids):
-        """
-        将用户添加到白名单中。
-        """
-        user_ids = self._tran_list(user_ids)
-        param_dict = locals().copy()
-        url = '/chatroom/user/whitelist/add.json'
-        format_str = 'chatroomId={{ room_id }}' \
-                     '{% for item in user_ids %}&userId={{ item }}{% endfor %}'
         try:
-            self._check_param(room_id, str, '1~64')
-            self._check_param(user_ids, list, '1~5')
-            for user in user_ids:
-                self._check_param(user, str, '1~64')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-    def remove(self, room_id, user_ids):
-        """
-        将用户从白名单中移除。
-        """
-        user_ids = self._tran_list(user_ids)
-        param_dict = locals().copy()
-        url = '/chatroom/user/whitelist/remove.json'
-        format_str = 'chatroomId={{ room_id }}' \
-                     '{% for item in user_ids %}&userId={{ item }}{% endfor %}'
-        try:
-            self._check_param(room_id, str, '1~64')
-            self._check_param(user_ids, list, '1~5')
-            for user in user_ids:
-                self._check_param(user, str, '1~64')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-    def query(self, room_id):
-        """
-        获取聊天室用户白名单。
-        """
-        param_dict = locals().copy()
-        url = '/chatroom/user/whitelist/query.json'
-        format_str = 'chatroomId={{ room_id }}'
-        try:
-            self._check_param(room_id, str, '1~64')
-            return self._http_post(url, self._render(param_dict, format_str))
+            return self._http_post(url)
         except ParamException as e:
             return json.loads(str(e))

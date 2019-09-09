@@ -7,6 +7,12 @@ from rongcloud.module import Module, ParamException
 class Message(Module):
     def __init__(self, rc):
         super().__init__(rc)
+        self._user_info = None
+
+    def set_user_info(self, user_id, name, icon, extra=None):
+        param_dict = locals().copy()
+        format_str = '"id":"{{ user_id }}","name":"{{ name }}","icon":"{{ icon }}","extra":"{{ extra }}"'
+        self._user_info = self._render(param_dict, format_str)
 
     def get_private(self):
         return Private(self._rc)
@@ -29,7 +35,7 @@ class Private(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_user_ids, object_name, content, push_content=None, push_data=None,
-             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0):
+             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0, attach_user_info=False):
         """
         发送单聊消息。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -41,22 +47,23 @@ class Private(Module):
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
         :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，则发送后用户一定会收到 Push 信息。
                                     如果为自定义消息，则 pushContent 为自定义消息显示的 Push 内容，
-                                    如果不传则用户不会收到 Push 通知。(可选)
+                                    如果不传则用户不会收到 Push 通知。（非必传）
         :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
-                                    Android 客户端收到推送消息时对应字段名为 pushData。(可选)
-        :param count:               针对 iOS 平台，Push 时用来控制未读消息显示数，只有在 toUserId 为一个用户 Id 的时候有效，
+                                    Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
+        :param count:               针对 iOS 平台，Push 时用来控制未读消息显示数，只有在 to_user_ids 为一个用户 Id 的时候有效，
                                     客户端获取远程推送内容时为 badge 查看详细，
-                                    为 -1 时不改变角标数，传入相应数字表示把角标数改为指定的数字，最大不超过 9999。(可选)
-        :param verify_blacklist:    是否过滤接收用户黑名单列表，0 表示为不过滤、1 表示为过滤，默认为 0 不过滤。(可选)
+                                    为 -1 时不改变角标数，传入相应数字表示把角标数改为指定的数字，最大不超过 9999。（非必传）
+        :param verify_blacklist:    是否过滤接收用户黑名单列表，0 表示为不过滤，1 表示为过滤，默认为 0 不过滤。（非必传）
         :param is_persisted:        针对融云服务端是否存储此条消息，客户端则根据消息注册的 ISPERSISTED 标识判断是否存储，
                                     如果旧版客户端上未注册该消息时，收到该消息后默认为存储，但无法解析显示。
-                                    0 表示为不存储、 1 表示为存储，默认为 1 存储消息。(可选)
+                                    0 表示为不存储，1 表示为存储，默认为 1 存储消息。（非必传）
         :param is_include_sender:   发送用户自己是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收，
-                                    只有在 toUserId 为一个用户 Id 的时候有效。（可选）
+                                    只有在 toUserId 为一个用户 Id 的时候有效。（非必传）
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
-                                    1 表示为开启，0 表示为关闭，默认为 0（可选）
-        :return:                    请求返回结果。
+                                    1 表示为开启，0 表示为关闭，默认为 0（非必传）
+        :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
+        :return:                    返回码，200 为正常。如：{"code":200}
         """
         to_user_ids = self._tran_list(to_user_ids)
         content = urllib.parse.quote(json.dumps(content))
@@ -76,8 +83,8 @@ class Private(Module):
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_user_ids, list, '1~1000')
-            for user in to_user_ids:
-                self._check_param(user, str, '1~64')
+            for to_user_id in to_user_ids:
+                self._check_param(to_user_id, str, '1~64')
             self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(push_content, str)
@@ -103,7 +110,7 @@ class Private(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果。
+        :return:                    返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -186,9 +193,27 @@ class Group(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_group_id, object_name, content, push_content=None, push_data=None,
-             is_persisted=1, is_counted=1, is_include_sender=0, is_mentioned=0, content_available=0):
+             is_persisted=1, is_counted=1, is_include_sender=0, is_mentioned=0, content_available=0, attach_user_info=False):
         """
-        发送群组消息。
+        发送群组消息，以一个用户身份向群组发送消息，单条消息最大 128k。
+        :param from_user_id:        发送人用户 Id 。（必传）
+        :param to_group_id:         接收群 Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；
+                                    可自定义消息类型，长度不超过 32 个字符，您在自定义消息时需要注意，不要以 "RC:" 开头，
+                                    以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
+                                    则发送后用户一定会收到 Push 信息。 如果为自定义消息，
+                                    则 pushContent 为自定义消息显示的 Push 内容，如果不传则用户不会收到 Push 通知。（非必传）
+        :param push_data:
+        :param is_persisted:
+        :param is_counted:
+        :param is_include_sender:
+        :param is_mentioned:
+        :param content_available:
+        :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
+        :return:
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()

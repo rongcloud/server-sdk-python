@@ -158,14 +158,38 @@ class Group(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def get_usergag(self):
-        return UserGag(self._rc)
+    def get_user(self):
+        return User(self._rc)
+
+
+class User(Module):
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def query(self, group_id):
+        """
+        查询群成员。
+        :param group_id:            群 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常；users 群成员数组；id 群成员 Id。
+                                    如：{"code":200,"users":[{"id":"10001"},{"id":"10002"},{"id":"10000"},{"id":"10003"}]}
+        """
+        param_dict = locals().copy()
+        url = '/group/user/gag/add.json'
+        format_str = 'groupId={{ group_id }}'
+        try:
+            self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def get_gag(self):
+        return Gag(self._rc)
 
     def get_ban(self):
         return Ban(self._rc)
 
 
-class UserGag(Module):
+class Gag(Module):
     """
     如果不想让某一用户在群中发言时，可将此用户在群组中禁言，被禁言用户可以接收查看群组中用户聊天信息，但不能通过客户端 SDK 发送消息。
     提示：被禁言用户通过 Server API 发送的消息权限级别较高，不受禁言限制。
@@ -296,6 +320,77 @@ class Ban(Module):
             self._check_param(group_ids, list, '1~20')
             for group_id in group_ids:
                 self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def get_whitelist(self):
+        return Whitelist(self._rc)
+
+
+class Whitelist(Module):
+    """
+    在群组被禁言状态下，如果需要某些用户可以发言时，可将此用户加入到群组禁言用户白名单中。
+    群禁言用户白名单，只有群组被设置为全部禁言时才会生效。
+    """
+
+    def __init__(self, rc):
+        super().__init__(rc)
+
+    def add(self, user_ids, group_id):
+        """
+        添加禁言白名单用户。
+        :param user_ids:            用户 Id，支持一次添加多个用户，最多不超过 20 个。（必传）
+        :param group_id:            群组 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/group/user/ban/whitelist/add.json'
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+                     '&groupId={{ group_id }}'
+        try:
+            self._check_param(user_ids, list, '1~20')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def remove(self, user_ids, group_id):
+        """
+        移除禁言白名单用户。
+        :param user_ids:            用户 Id，支持同时移除多个用户，每次最多不超过 20 个。（必传）
+        :param group_id:            群组 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        user_ids = self._tran_list(user_ids)
+        param_dict = locals().copy()
+        url = '/group/user/ban/whitelist/rollback.json'
+        format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
+                     '&groupId={{ group_id }}'
+        try:
+            self._check_param(user_ids, list, '1~20')
+            for user_id in user_ids:
+                self._check_param(user_id, str, '1~64')
+            self._check_param(group_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
+    def query(self, group_id):
+        """
+        查询禁言白名单用户列表。
+        :param group_id:            群组 Id。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常；userIds 用户 Id。
+                                    如：{"code":200,"userIds":["2111","2582"]}
+        """
+        param_dict = locals().copy()
+        url = '/group/user/ban/whitelist/query.json'
+        format_str = 'groupId={{ group_id }}'
+        try:
+            self._check_param(group_id, str, '1~64')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))

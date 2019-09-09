@@ -172,7 +172,10 @@ class Block(Module):
                                     如：{"code":200,"users":[{"userId":"jlk456j5","blockEndTime":"2015-01-11 01:28:20"}]}
         """
         url = '/user/block/query.json'
-        return self._http_post(url)
+        try:
+            return self._http_post(url)
+        except ParamException as e:
+            return json.loads(str(e))
 
 
 class Blacklist(Module):
