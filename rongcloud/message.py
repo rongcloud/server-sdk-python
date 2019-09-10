@@ -14,6 +14,51 @@ class Message(Module):
         format_str = '"id":"{{ user_id }}","name":"{{ name }}","icon":"{{ icon }}","extra":"{{ extra }}"'
         self._user_info = self._render(param_dict, format_str)
 
+    def broadcast(self, from_user_id, object_name, content, push_content=None, push_data=None, os=None,
+                  content_available=0):
+        """
+        单个应用每小时只能发送 2 次，每天最多发送 3 次。如需要调整发送频率，可联系销售，电话 13161856839。
+        :param from_user_id:        发送人用户 Id。（必传）
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；可自定义消息类型，长度不超过 32 个字符，
+                                    您在自定义消息时需要注意，不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。
+                                    （必传）
+        :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
+                                    则发送后用户一定会收到 Push 信息。 如果为自定义消息，
+                                    则 pushContent 为自定义消息显示的 Push 内容，如果不传则用户不会收到 Push 通知。（非必传）
+        :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
+                                    Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
+        :param os:                  针对操作系统发送 Push，值为 iOS 表示对 iOS 手机用户发送 Push ,
+                                    为 Android 时表示对 Android 手机用户发送 Push ，
+                                    如对所有用户发送 Push 信息，则不需要传 os 参数。（非必传）
+        :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
+                                    允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
+                                    1 表示为开启，0 表示为关闭，默认为 0。（非必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        content = urllib.parse.quote(json.dumps(content))
+        param_dict = locals().copy()
+        url = '/message/broadcast.json'
+        format_str = 'fromUserId={{ from_user_id }}' \
+                     '&objectName={{ object_name }}' \
+                     '&content={{ content }}' \
+                     '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
+                     '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
+                     '{% if os is not none %}&os={{ os }}{% endif %}' \
+                     '{% if content_available != 0 %}&contentAvailable={{ content_available }}{% endif %}'
+        try:
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
+            self._check_param(content, str)
+            self._check_param(push_content, str)
+            self._check_param(push_data, str)
+            self._check_param(os, str)
+            self._check_param(content_available, int, '0~1')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
     def get_private(self):
         return Private(self._rc)
 
@@ -151,14 +196,14 @@ class Private(Module):
         :param content_available: 针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                   允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                   1 表示为开启，0 表示为关闭，默认为 0。
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         if push_content is None:
             push_content = []
         if push_data is None:
             push_data = []
         to_user_ids = self._tran_list(to_user_ids)
-        content = json.dumps(content).replace('\"', '\\"')
+        content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
         url = '/message/private/publish_template.json'
         format_str = '{' \
@@ -212,7 +257,7 @@ class Group(Module):
         :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
         :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
-                                    则发送后用户一定会收到 Push 信息。 如果为自定义消息，
+                                    则发送后用户一定会收到 Push 信息。如果为自定义消息，
                                     则 pushContent 为自定义消息显示的 Push 内容，如果不传则用户不会收到 Push 通知。（非必传）
         :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
                                     Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
@@ -229,7 +274,7 @@ class Group(Module):
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0（非必传）
         :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
@@ -271,7 +316,7 @@ class Group(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -302,7 +347,15 @@ class Chatroom(Module):
 
     def send(self, from_user_id, to_chatroom_id, object_name, content):
         """
-        发送聊天室消息。
+        发送聊天室消息。一个用户向聊天室发送消息，单条消息最大 128k。
+        :param from_user_id:        发送人用户 Id。（必传）
+        :param to_chatroom_id:      接收聊天室 Id，提供多个本参数可以实现向多个聊天室发送消息，建议最多不超过 10 个聊天室。（必传）
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；可自定义消息类型，长度不超过 32 个字符，
+                                    您在自定义消息时需要注意，不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。
+                                    （必传）
+        :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
@@ -332,7 +385,7 @@ class Chatroom(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/message/recall.json'
@@ -366,7 +419,7 @@ class Chatroom(Module):
                                     以避免与融云系统内置消息的 ObjectName 重名。（必传）
         :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
@@ -399,7 +452,7 @@ class System(Module):
         :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
                                     如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
         :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
-                                    则发送后用户一定会收到 Push 信息。 如果为自定义消息，
+                                    则发送后用户一定会收到 Push 信息。如果为自定义消息，
                                     则 pushContent 为自定义消息显示的 Push 内容，如果不传则用户不会收到 Push 通知。（非必传）
         :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
                                     Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
@@ -409,7 +462,7 @@ class System(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0。（非必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
@@ -455,7 +508,7 @@ class System(Module):
                      '"content":"{{ content }}",' \
                      '"pushContent":' \
                      '[{% for item in push_content %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"pushData":' \
+                     '"pusData":' \
                      '[{% for item in push_data %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
                      '"contentAvailable":{{ content_available }}' \
                      '}'
@@ -476,62 +529,48 @@ class System(Module):
             return json.loads(str(e))
 
 
-class Broadcast(Module):
-    def __init__(self, rc):
-        super().__init__(rc)
-
-    def send(self, from_user_id, object_name, content, push_content='', push_data='', content_available=0):
-        """
-        发给应用内所有用户发送消息，每小时最多发 2 次，每天最多发送 3 次。
-        """
-        content = urllib.parse.quote(json.dumps(content))
-        param_dict = locals().copy()
-        url = '/message/broadcast.json'
-        format_str = 'fromUserId={{ from_user_id }}' \
-                     '&objectName={{ object_name }}' \
-                     '&content={{ content }}' \
-                     '&pushContent={{ push_content }}' \
-                     '&pushData={{ push_data }}' \
-                     '&contentAvailable={{ content_available }}'
-        try:
-            self._check_param(from_user_id, str, '1~64')
-            self._check_param(object_name, str, '1~32')
-            self._check_param(content, str)
-            self._check_param(push_content, str)
-            self._check_param(push_data, str)
-            self._check_param(content_available, int, '0~1')
-            return self._http_post(url, self._render(param_dict, format_str))
-        except ParamException as e:
-            return json.loads(str(e))
-
-
 class History(Module):
     def __init__(self, rc):
         super().__init__(rc)
 
     def query(self, date):
         """
-        按小时获取历史消息日志文件 URL，包含小时内应用产生的所有消息，消息日志文件无论是否已下载，3 天后将从融云服务器删除
-        消息日志文件按 小时 生成，例如: 获取 10 - 11 点的消息， 11 点后生成。
+        免费获取 APP 内指定某天某小时内的所有会话消息记录的下载地址。
+        （目前支持二人会话，讨论组，群组，聊天室，客服，系统通知消息历史记录下载），
+        消息记录以日志文件方式提供，并对文件进行 ZIP 压缩。
+        :param date:                国内数据中心为指定北京时间某天某小时，格式为字符串 "2014010101"，
+                                    表示获取 2014 年 1 月 1 日凌晨 1 点至 2 点的数据。
+                                    如使用的是融云海外数据中心为 UTC 时间。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常；
+                                    url 历史记录下载地址，如没有消息记录数据时，则 url 值为空。date 历史记录时间。
+                                    如：{
+                                        "code":200,
+                                        "url":"http://aa.com/1/c6720eea-452b-4f93-8159-7af3046611f1.gz",
+                                        "date":"2014010101"
+                                    }
         """
         param_dict = locals().copy()
         url = '/message/history.json'
         format_str = 'date={{ date }}'
         try:
-            self._check_param(date, str, '1-30')
+            self._check_param(date, str, '10~10')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
     def remove(self, date):
         """
-        删除历史消息日志文件。
+        删除服务端消息记录日志文件，文件内容为 APP 内指定某天某小时内的所有会话消息记录，删除后文件将在随后的 10 分钟内被永久删除。
+        开通单群聊消息云存储功能后存储在云端的数据不会被删除，只是无法再通过“消息历史记录下载地址获取方法”获取消息日志文件。
+        :param date:                指定北京时间某天某小时，格式为字符串 "2014010101"，
+                                    表示：2014 年 1 月 1 日凌晨1点。返回成功后，消息记录文件将在随后的 10 分钟内被永久删除。（必传）
+        :return:                    请求返回结果，code 返回码，200 为正常；如：{"code":200}
         """
         param_dict = locals().copy()
         url = '/message/history/delete.json'
         format_str = 'date={{ date }}'
         try:
-            self._check_param(date, str, '1-30')
+            self._check_param(date, str, '10~10')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))

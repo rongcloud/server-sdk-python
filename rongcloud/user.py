@@ -127,7 +127,7 @@ class Block(Module):
         封禁用户
         :param user_ids:            用户 Id，支持一次封禁多个用户，最多不超过 20 个。（必传）
         :param minute:              封禁时长，单位为分钟，最大值为43200分钟。（必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -147,7 +147,7 @@ class Block(Module):
         """
         解除用户封禁。
         :param user_ids:            用户 Id，支持一次解除多个用户，最多不超过 20 个。（必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
@@ -190,7 +190,7 @@ class Blacklist(Module):
         添加用户到黑名单。
         :param user_id:             用户 Id。（必传）
         :param black_ids:           被加黑的用户 Id，每次最多添加 20 个用户。(必传)
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
@@ -211,7 +211,7 @@ class Blacklist(Module):
         移除黑名单中用户。
         :param user_id:             用户 Id。（必传）
         :param black_ids:           被移除的用户 Id，每次最多移除 20 个用户。(必传)
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         black_ids = self._tran_list(black_ids)
         param_dict = locals().copy()
@@ -257,7 +257,7 @@ class Whitelist(Module):
         添加用户到白名单。
         :param user_id:             用户 Id。（必传）
         :param white_ids:           被添加的用户 Id，每次最多添加 20 个用户。(必传)
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         white_ids = self._tran_list(white_ids)
         param_dict = locals().copy()
@@ -278,7 +278,7 @@ class Whitelist(Module):
         移除白名单中用户。
         :param user_id:             用户 Id。（必传）
         :param white_ids:           被移除的用户 Id，每次最多移除 20 个用户。(必传)
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         white_ids = self._tran_list(white_ids)
         param_dict = locals().copy()
@@ -321,7 +321,7 @@ class Tag(Module):
         :param user_ids:            用户 Id 或 Id 列表，一次最多支持 1000 个用户。（必传）
         :param tags:                用户标签，一个用户最多添加 20 个标签，每个 tag 最大不能超过 40 个字节，
                                     标签中不能包含特殊字符。（必传）
-        :return:                    请求返回结果，code 返回码，200 为正常。 如：{"code":200}
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         user_ids = self._tran_list(user_ids)
         param_dict = locals().copy()
