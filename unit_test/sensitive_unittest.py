@@ -22,7 +22,7 @@ class SensitiveTestCase(unittest.TestCase):
         self.assertEqual(rep['code'], 200, rep)
 
     def test_query(self):
-        word_type = Sensitive.SENSITIVE_ALL
+        word_type = 2
         rep = rc.get_sensitive().query(word_type)
         self.assertEqual(rep['code'], 200, rep)
 

@@ -42,7 +42,7 @@ class Notification(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def unmute(self, conversation_type, user_id, target_id):
+    def get(self, conversation_type, user_id, target_id):
         """
         查询用户某一会话消息免打扰的设置状态。。
         :param conversation_type:   会话类型，二人会话是 1，讨论组会话是 2，群组会话是 3，客服会话是 5，系统通知是 6，
@@ -55,7 +55,7 @@ class Notification(Module):
                                     如：{"code":200}
         """
         param_dict = locals().copy()
-        url = '/conversation/notification/set.json'
+        url = '/conversation/notification/get.json'
         format_str = 'conversationType={{ conversation_type }}' \
                      '&requestId={{ user_id }}' \
                      '&targetId={{ target_id }}'

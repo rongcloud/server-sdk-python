@@ -174,7 +174,7 @@ class User(Module):
                                     如：{"code":200,"users":[{"id":"10001"},{"id":"10002"},{"id":"10000"},{"id":"10003"}]}
         """
         param_dict = locals().copy()
-        url = '/group/user/gag/add.json'
+        url = '/group/user/query.json'
         format_str = 'groupId={{ group_id }}'
         try:
             self._check_param(group_id, str, '1~64')

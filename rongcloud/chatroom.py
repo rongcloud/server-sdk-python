@@ -83,10 +83,10 @@ class Chatroom(Module):
     def get_message(self):
         return Message(self._rc)
 
-    def get_while_list(self):
-        return WhileList(self._rc)
+    def get_whitelist(self):
+        return WhiteList(self._rc)
 
-    def get_keep_alive(self):
+    def get_keepalive(self):
         return KeepAlive(self._rc)
 
 
@@ -122,7 +122,7 @@ class User(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def is_exist(self, room_id, user_ids):
+    def isexist(self, room_id, user_ids):
         """
         查询用户是否在聊天室。
         :param room_id:             要查询的聊天室 ID（必传）
@@ -153,7 +153,7 @@ class User(Module):
         else:
             url = '/chatroom/users/exist.json'
             format_str = 'chatroomId={{ room_id }}' \
-                         '{% for item in user_ids %}userId={{ item }}{% if not loop.last %}&{% endif %}{% endfor %}'
+                         '{% for item in user_ids %}&userId={{ item }}{% endfor %}'
             try:
                 self._check_param(room_id, str, '1~64')
                 self._check_param(user_ids, list, '1~1000')
@@ -164,19 +164,19 @@ class User(Module):
                 return json.loads(str(e))
 
     def get_gag(self):
-        return Gag(self._rc)
+        return UserGag(self._rc)
 
     def get_ban(self):
-        return Ban(self._rc)
+        return UserBan(self._rc)
 
     def get_block(self):
-        return Block(self._rc)
+        return UserBlock(self._rc)
 
     def get_whitelist(self):
-        return WhileList(self._rc)
+        return UserWhileList(self._rc)
 
 
-class Gag(Module):
+class UserGag(Module):
     """
     在 App 中如果不想让某一用户在聊天室中发言时，可将此用户在聊天室中禁言，被禁言用户可以接收查看聊天室中用户聊天信息，但不能发送消息。
     """
@@ -247,7 +247,7 @@ class Gag(Module):
             return json.loads(str(e))
 
 
-class Ban(Module):
+class UserBan(Module):
     """
     如果不想让某一用户在所有聊天室中发言时，可将此用户添加到聊天室全局禁言中，被禁言用户可以接收查看聊天室中用户聊天信息，但不能发送消息。
     此服务在开通 IM 商用版的情况下，可申请开通，详细请联系商务，电话：13161856839。
@@ -309,7 +309,7 @@ class Ban(Module):
             return json.loads(str(e))
 
 
-class Block(Module):
+class UserBlock(Module):
     """
     在 App 中如果想将某一用户踢出聊天室并在一段时间内不允许再进入聊天室时，可实现将用户对指定的聊天室做封禁处理，
     被封禁用户将被踢出聊天室，并在设定的时间内不能再进入聊天室中。
@@ -352,7 +352,7 @@ class Block(Module):
         param_dict = locals().copy()
         url = '/chatroom/user/block/rollback.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
-                     'chatroomId={{ room_id }}'
+                     '&chatroomId={{ room_id }}'
         try:
             self._check_param(user_ids, list, '1~20')
             for user_id in user_ids:
@@ -380,7 +380,7 @@ class Block(Module):
             return json.loads(str(e))
 
 
-class WhileList(Module):
+class UserWhileList(Module):
     """
     现在聊天室中用户在离线 30 秒后或离线后聊天室中产生 30 条消息时会被自动踢出聊天室。
     将用户加入到白名单后，用户将处于被保护状态，在以上情况下将不会被自动踢出聊天室。
@@ -487,10 +487,10 @@ class Message(Module):
             return json.loads(str(e))
 
     def get_priority(self):
-        return Priority(self._rc)
+        return MessagePriority(self._rc)
 
 
-class Priority(Module):
+class MessagePriority(Module):
     """
     通过聊天室消息优先级接口，设置的消息类型为 Low Level 的消息，默认情况下全部为 High Level 的消息，
     当服务器负载高时 Low Level 的消息优先被丢弃，这样可以让出资源给 High Level 的消息，确保重要的消息不被丢弃，设置后 2 小时生效。
@@ -549,7 +549,7 @@ class Priority(Module):
             return json.loads(str(e))
 
 
-class WhileList(Module):
+class WhiteList(Module):
     """
     设置消息类型，确保在服务器负载高时聊天室中重要类型的消息不被丢弃，设置后 2 小时生效。
     此服务在开通 IM 商用版的情况下，可申请开通，详细请联系商务，电话：13161856839。

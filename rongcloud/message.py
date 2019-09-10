@@ -80,8 +80,7 @@ class Private(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_user_ids, object_name, content, push_content=None, push_data=None,
-             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0,
-             attach_user_info=False):
+             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0):
         """
         发送单聊消息。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -135,7 +134,7 @@ class Private(Module):
             self._check_param(content, str)
             self._check_param(push_content, str)
             self._check_param(push_data, str)
-            self._check_param(count, '-1~9999')
+            self._check_param(count, int, '-1~9999')
             self._check_param(verify_blacklist, int, '0~1')
             self._check_param(is_persisted, int, '0~1')
             self._check_param(is_include_sender, int, '0~1')
@@ -180,47 +179,52 @@ class Private(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def send_template(self, from_user_id, to_user_ids, object_name, content, values,
+    def send_template(self, from_user_id, to_user_ids, object_name, values, content,
                       push_content=None, push_data=None, verify_blacklist=0, content_available=0):
         """
-        向多个用户发送不同内容消息。
-        :param from_user_id: 发送人用户 ID。
-        :param to_user_ids: 接收用户 ID。可以实现向多人发送消息，每次上限为 1000 人。
-        :param object_name: 发送的消息类型。
-        :param content: 消息内容。
-        :param values: 消息内容中，标识位对应内容。
-        :param push_content: 当前版本有新的自定义消息，而老版本没有该自定义消息时，老版本客户端收到消息后是否进行存储，
-                             0 表示为不存储、 1 表示为存储，默认为 1 存储消息。
-        :param push_data: 针对 iOS 平台为 Push 通知时附加到 payload 中，Android 客户端收到推送消息时对应字段名为 pushData。
-        :param verify_blacklist: 是否过滤发送人黑名单列表，0 表示为不过滤、 1 表示为过滤，默认为 0 不过滤。
-        :param content_available: 针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
-                                  允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
-                                  1 表示为开启，0 表示为关闭，默认为 0。
+        发送单聊模板消息。一个用户向多个用户发送不同消息内容，单条消息最大 128k。
+        :param from_user_id:        发送人用户 Id。（必传）
+        :param to_user_ids:         接收用户 Id，提供多个本参数可以实现向多人发送消息，上限为 1000 人。（必传）
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；可自定义消息类型，长度不超过 32 个字符，
+                                    您在自定义消息时需要注意，不要以 "RC:" 开头，
+                                    以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param values:              消息内容中，标识位对应内容。（必传）
+        :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
+                                    则发送后用户一定会收到 Push 信息。如果为自定义消息，定义显示的 Push 内容，
+                                    内容中定义标识通过 values 中设置的标识位内容进行替换。
+                                    如消息类型为自定义不需要 Push 通知，则对应数组传空值即可。（必传）
+        :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
+                                    Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
+        :param verify_blacklist:    是否过滤发送人黑名单列表，0 为不过滤、 1 为过滤，默认为 0 不过滤。（非必传）
+        :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
+                                    允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
+                                    1 表示为开启，0 表示为关闭，默认为 0。（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         if push_content is None:
             push_content = []
-        if push_data is None:
-            push_data = []
         to_user_ids = self._tran_list(to_user_ids)
-        content = urllib.parse.quote(json.dumps(content))
+        content = json.dumps(content).replace('\"', '\\"')
         param_dict = locals().copy()
         url = '/message/private/publish_template.json'
         format_str = '{' \
-                     '"fromUserId":"{{ from_user_id }}",' \
-                     '"toUserId":[{% for item in to_user_ids %}"{{ item }}"' \
-                     '{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"objectName":"{{ object_name }}",' \
-                     '"values":[{% for item in values %}{% raw %}{{% endraw %}' \
+                     '"fromUserId":"{{ from_user_id }}"' \
+                     ',"toUserId":[{% for item in to_user_ids %}"{{ item }}"' \
+                     '{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     ',"objectName":"{{ object_name }}"' \
+                     ',"values":[{% for item in values %}{% raw %}{{% endraw %}' \
                      '{% for key, value in item.items() %}"{{ key }}":"{{ value }}"{% if not loop.last %},{% endif %}' \
-                     '{% endfor %}{% raw %}}{% endraw %}{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"content":"{{ content }}",' \
-                     '"pushContent":' \
-                     '[{% for item in push_content %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"pushData":' \
-                     '[{% for item in push_data %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"verifyBlacklist":{{ verify_blacklist }},' \
-                     '"contentAvailable":{{ content_available }}' \
+                     '{% endfor %}{% raw %}}{% endraw %}{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     ',"content":"{{ content }}"' \
+                     ',"pushContent":' \
+                     '[{% for item in push_content %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     '{% if push_data is not none %},"pushData":' \
+                     '[{% for item in push_data %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     '{% endif %}' \
+                     '{% if (verify_blacklist != 0) %},"verifyBlacklist":{{ verify_blacklist }}{% endif %}' \
+                     '{% if (content_available != 0) %},"contentAvailable":{{ content_available }}{% endif %}' \
                      '}'
         try:
             self._check_param(from_user_id, str, '1~64')
@@ -245,8 +249,7 @@ class Group(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_group_id, object_name, content, push_content=None, push_data=None,
-             is_persisted=1, is_include_sender=0, is_mentioned=0, content_available=0,
-             attach_user_info=False):
+             is_persisted=1, is_include_sender=0, is_mentioned=0, content_available=0):
         """
         发送群组消息，以一个用户身份向群组发送消息，单条消息最大 128k。
         :param from_user_id:        发送人用户 Id 。（必传）
@@ -285,10 +288,10 @@ class Group(Module):
                      '&content={{ content }}' \
                      '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
                      '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
-                     '&isPersisted={{ is_persisted }}' \
-                     '&isIncludeSender={{ is_include_sender }}' \
-                     '&isMentioned={{ is_mentioned }}' \
-                     '&contentAvailable={{ content_available }}'
+                     '{% if (is_persisted != 1) %}&isPersisted={{ is_persisted }}{% endif %}' \
+                     '{% if (is_include_sender != 0) %}&isIncludeSender={{ is_include_sender }}{% endif %}' \
+                     '{% if (is_mentioned != 0) %}&isMentioned={{ is_mentioned }}{% endif %}' \
+                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_group_id, str, '1~64')
@@ -440,7 +443,7 @@ class System(Module):
     def __init__(self, rc):
         super().__init__(rc)
 
-    def send(self, from_user_id, to_user_ids, object_name, content, push_content='', push_data='',
+    def send(self, from_user_id, to_user_ids, object_name, content, push_content=None, push_data=None,
              is_persisted=1, content_available=0):
         """
         发送系统消息，一个用户向一个或多个用户发送系统消息，单条消息最大 128k，会话类型为 SYSTEM。
@@ -464,16 +467,23 @@ class System(Module):
                                     1 表示为开启，0 表示为关闭，默认为 0。（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
+        to_user_ids = self._tran_list(to_user_ids)
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
         url = '/message/system/publish.json'
         format_str = 'fromUserId={{ from_user_id }}' \
-                     '&toUserId={{ to_user_id }}' \
+                     '{% for item in to_user_ids %}&toUserId={{ item }}{% endfor %}' \
                      '&objectName={{ object_name }}' \
-                     '&content={{ content }}'
+                     '&content={{ content }}' \
+                     '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
+                     '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
+                     '{% if (is_persisted != 1) %}&isPersisted={{ is_persisted }}{% endif %}' \
+                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
-            self._check_param(to_user_ids, str, '1~64')
+            self._check_param(to_user_ids, list, '1~100')
+            for to_user_id in to_user_ids:
+                self._check_param(to_user_id, str, '1~64')
             self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(push_content, str)
@@ -484,38 +494,58 @@ class System(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def send_template(self, from_user_id, to_user_list, object_name, content, values,
+    def send_template(self, from_user_id, to_user_ids, object_name, content, values,
                       push_content=None, push_data=None, content_available=0):
         """
-        向多个用户发送不同内容的系统消息。。
+        发送系统模板消息。一个用户向一个或多个用户发送系统消息，单条消息最大 128k，会话类型为 SYSTEM。
+        :param from_user_id:        发送人用户 Id。（必传）
+        :param to_user_ids:         接收用户 Id，提供多个本参数可以实现向多人发送消息，上限为 100 人。（必传）
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；可自定义消息类型，长度不超过 32 个字符，
+                                    您在自定义消息时需要注意，不要以 "RC:" 开头，
+                                    以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param content:             消息内容中，标识位对应内容。（必传）
+        :param values:              发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
+                                    则发送后用户一定会收到 Push 信息。如果为自定义消息，定义显示的 Push 内容，
+                                    内容中定义标识通过 values 中设置的标识位内容进行替换。
+                                    如消息类型为自定义不需要 Push 通知，则对应数组传空值即可。（必传）
+        :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
+                                    Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
+        :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
+                                    允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
+                                    1 表示为开启，0 表示为关闭，默认为 0。（非必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         if push_content is None:
             push_content = []
-        if push_data is None:
-            push_data = []
+        """
+        向多个用户发送不同内容的系统消息。。
+        """
         content = json.dumps(content).replace('\"', '\\"')
         param_dict = locals().copy()
         url = '/message/system/publish_template.json'
         format_str = '{' \
-                     '"fromUserId":"{{ from_user_id }}",' \
-                     '"toUserId":[{% for item in to_user_list %}"{{ item }}"' \
-                     '{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"objectName":"{{ object_name }}",' \
-                     '"values":[{% for item in values %}{% raw %}{{% endraw %}' \
+                     '"fromUserId":"{{ from_user_id }}"' \
+                     ',"toUserId":[{% for item in to_user_ids %}"{{ item }}"' \
+                     '{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     ',"objectName":"{{ object_name }}"' \
+                     ',"values":[{% for item in values %}{% raw %}{{% endraw %}' \
                      '{% for key, value in item.items() %}"{{ key }}":"{{ value }}"' \
                      '{% if not loop.last %},{% endif %}{% endfor %}{% raw %}}{% endraw %}' \
-                     '{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"content":"{{ content }}",' \
-                     '"pushContent":' \
-                     '[{% for item in push_content %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"pusData":' \
-                     '[{% for item in push_data %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}],' \
-                     '"contentAvailable":{{ content_available }}' \
+                     '{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     ',"content":"{{ content }}"' \
+                     ',"pushContent":' \
+                     '[{% for item in push_content %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     '{% if push_data is not none %},"pushData":' \
+                     '[{% for item in push_data %}"{{ item }}"{% if not loop.last %},{% endif %}{% endfor %}]' \
+                     '{% endif %}' \
+                     '{% if (content_available != 0) %},"contentAvailable":{{ content_available }}{% endif %}' \
                      '}'
         try:
             self._check_param(from_user_id, str, '1~64')
-            self._check_param(to_user_list, list, '1~1000')
-            for user in to_user_list:
+            self._check_param(to_user_ids, list, '1~1000')
+            for user in to_user_ids:
                 self._check_param(user, str, '1~64')
             self._check_param(object_name, str, '1~32')
             self._check_param(content, str)

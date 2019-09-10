@@ -10,9 +10,6 @@ class Sensitive(Module):
     如果需要过滤敏感词请提交工单申请开通。
     敏感词过滤方式有两种：屏蔽包含敏感词的消息和替换敏感词，详细请查看屏蔽包含敏感词的消息与替换敏感词功能说明
     """
-    SENSITIVE_REPLACE = 0
-    SENSITIVE_BLOCK = 1
-    SENSITIVE_ALL = 2
 
     def __init__(self, rc):
         super().__init__(rc)

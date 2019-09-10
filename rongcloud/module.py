@@ -58,7 +58,9 @@ class Module:
         except socket.timeout:
             self._rc.host_url.switch_url()
             raise
-        return json.loads(rep.decode('utf8'))
+        rep = json.loads(rep.decode('utf8'))
+        print(rep)
+        return rep
 
     @staticmethod
     def _check_param(obj, obj_type, obj_range=None):
