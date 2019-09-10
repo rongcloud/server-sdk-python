@@ -39,7 +39,7 @@ class Module:
                 HEADER_NONCE: nonce,
                 HEADER_TIMESTAMP: timestamp,
                 HEADER_SIGNATURE: signature,
-                HEADER_USER_AGENT: 'rc-python-sdk/3.0.0'}
+                HEADER_USER_AGENT: 'rc-python-sdk/3.1.0'}
 
     def _http_post(self, url, data=''):
         print('post_body:' + data)
