@@ -210,7 +210,7 @@ class Gag(Module):
         param_dict = locals().copy()
         url = '/group/user/gag/add.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
-                     '{% if group_id is not none %}groupId={{ group_id }}{% endif %}' \
+                     '{% if group_id is not none %}&groupId={{ group_id }}{% endif %}' \
                      '&minute={{ minute }}'
         try:
             self._check_param(user_ids, list, '1~20')

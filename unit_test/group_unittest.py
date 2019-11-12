@@ -69,14 +69,21 @@ class GroupTestCase(unittest.TestCase):
         self.assertEqual(rep['code'], 200, rep)
 
     def test_user_gag_add(self):
-        user_id = '2582'
-        group_id = '16'
-        minute = 1
-        rep = rc.get_group().get_user().get_gag().add(user_id, group_id, minute)
-        self.assertEqual(rep['code'], 200, rep)
+        # 创建群组 '16'，并加入 '2582', '2583'
         user_ids = ['2582', '2583']
         group_id = '16'
-        minute = 1
+        group_name = 'TestGroup'
+        rep = rc.get_group().create(user_ids, group_id, group_name)
+        self.assertEqual(rep['code'], 200, rep)
+        # 禁言 '2582'
+        user_id = '2582'
+        minute = 10
+        rep = rc.get_group().get_user().get_gag().add(user_id, group_id, minute)
+        self.assertEqual(rep['code'], 200, rep)
+        # 禁言 '2582', '2583'
+        user_ids = ['2582', '2583']
+        group_id = '16'
+        minute = 10
         rep = rc.get_group().get_user().get_gag().add(user_ids, group_id, minute)
         self.assertEqual(rep['code'], 200, rep)
 
