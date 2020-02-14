@@ -106,7 +106,7 @@ class User(Module):
         return Blacklist(self._rc)
 
     def get_whitelist(self):
-        return Whitelist(self.rc)
+        return Whitelist(self._rc)
 
     def get_tag(self):
         return Tag(self._rc)
