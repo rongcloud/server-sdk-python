@@ -4,7 +4,7 @@ import random
 import socket
 import time
 from urllib import request
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 from jinja2 import Template
 
@@ -42,7 +42,6 @@ class Module:
                 HEADER_USER_AGENT: 'rc-python-sdk/3.1.1'}
 
     def _http_post(self, url, data=''):
-        print('post_body:' + data)
         data = '{}'.encode('utf-8') if data is None else data.encode('utf-8')
         headers = self._signature()
         try:
@@ -55,11 +54,14 @@ class Module:
             rep = request.urlopen(req).read()
         except HTTPError as e:
             rep = e.read()
+        except URLError:
+            self._rc.host_url.switch_url()
+            rep = json.loads('{"code":-1, "reason":"URL error."}')
         except socket.timeout:
             self._rc.host_url.switch_url()
-            raise
-        rep = json.loads(rep.decode('utf8'))
-        print(rep)
+            rep = json.loads('{"code":-1, "reason":"Socket timeout."}')
+        else:
+            rep = json.loads(rep.decode('utf8'))
         return rep
 
     @staticmethod
