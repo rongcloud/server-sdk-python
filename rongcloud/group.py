@@ -233,7 +233,7 @@ class Gag(Module):
         param_dict = locals().copy()
         url = '/group/user/gag/rollback.json'
         format_str = '{% for item in user_ids %}{% if not loop.first %}&{% endif %}userId={{ item }}{% endfor %}' \
-                     '{% if group_id is not none %}groupId={{ group_id }}{% endif %}'
+                     '{% if group_id is not none %}&groupId={{ group_id }}{% endif %}'
         try:
             self._check_param(user_ids, list, '1~20')
             for user_id in user_ids:
