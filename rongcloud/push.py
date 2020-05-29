@@ -57,27 +57,21 @@ class Push(Module):
             # key - from_user_id
             self._check_param(from_user_id, str, '1~64')
             # key - audience
-            for tag in tags:
-                self._check_param(tag, str, '1~64')
-            self._check_param(tags, list, '1~20')
-            for tag in tags:
-                self._check_param(tag, str, '1~64')
-            self._check_param(tags_or, list, '1~20')
-            for tag_or in tags_or:
-                self._check_param(tag_or, str, '1~64')
-            self._check_param(user_ids, list, '1~1000')
-            for user_id in user_ids:
-                self._check_param(user_id, str, '1~64')
-            self._check_param(is_to_all, bool)
             audience = {}
             if tags is not None:
                 audience['tag'] = tags
             if tags_or is not None:
+                self._check_param(tags_or, list, '1~20')
+                for tag_or in tags_or:
+                    self._check_param(tag_or, str, '1~64')
                 audience['tag_or'] = tags_or
             if user_ids is not None:
+                self._check_param(user_ids, list, '1~1000')
+                for user_id in user_ids:
+                    self._check_param(user_id, str, '1~64')
                 audience['userid'] = user_ids
-            if is_to_all is not None:
-                audience['is_to_all'] = is_to_all
+            self._check_param(is_to_all, bool)
+            audience['is_to_all'] = is_to_all
             # key - message
             self._check_param(object_name, str, '1~32')
             content = urllib.parse.quote(json.dumps(content))
@@ -153,29 +147,28 @@ class Push(Module):
             for platform in platforms:
                 self._check_param(platform, str, '1~64')
             # key - audience
-            for tag in tags:
-                self._check_param(tag, str, '1~64')
-            self._check_param(tags, list, '1~20')
-            for tag in tags:
-                self._check_param(tag, str, '1~64')
-            self._check_param(tags_or, list, '1~20')
-            for tag_or in tags_or:
-                self._check_param(tag_or, str, '1~64')
-            self._check_param(user_ids, list, '1~1000')
-            for user_id in user_ids:
-                self._check_param(user_id, str, '1~64')
             self._check_param(is_to_all, bool)
             audience = {}
             if tags is not None:
+                self._check_param(tags, list, '1~20')
+                for tag in tags:
+                    self._check_param(tag, str, '1~64')
                 audience['tag'] = tags
             if tags_or is not None:
+                self._check_param(tags_or, list, '1~20')
+                for tag_or in tags_or:
+                    self._check_param(tag_or, str, '1~64')
                 audience['tag_or'] = tags_or
             if user_ids is not None:
+                self._check_param(user_ids, list, '1~1000')
+                for user_id in user_ids:
+                    self._check_param(user_id, str, '1~64')
                 audience['userid'] = user_ids
-            if is_to_all is not None:
-                audience['is_to_all'] = is_to_all
             if package_name is not None:
+                self._check_param(package_name, str, '1~64')
                 audience['packageName'] = package_name
+            self._check_param(is_to_all, bool)
+            audience['is_to_all'] = is_to_all
             # key - notification
             notification = {'alert': alert}
             ios = {}
