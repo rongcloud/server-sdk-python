@@ -324,7 +324,7 @@ class Group(Module):
         param_dict = locals().copy()
         url = '/message/recall.json'
         format_str = 'fromUserId={{ from_user_id }}' \
-                     '&conversationType=1' \
+                     '&conversationType=3' \
                      '&targetId={{ group_id }}' \
                      '&messageUID={{ uid }}' \
                      '&sentTime={{ sent_time }}' \
