@@ -386,7 +386,7 @@ class Group(Module):
         '''
         发送群聊状态消息
         :param from_user_id:            发送人用户 Id。（必传）
-        :param to_group_ids:             接收群Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
+        :param to_group_ids:            接收群Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
         :param object_name:             消息类型，可自定义消息类型，长度不超过 32 个字符，在自定义消息时需要注意，
                                         不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。（必传）
         :param content:                 发送消息内容，单条消息最大 128k，详见消息结构示例；如果 objectName 为自定义消息类型，该参数可自定义格式。（必传）
@@ -396,6 +396,7 @@ class Group(Module):
         '''
 
         content = urllib.parse.quote(json.dumps(content))
+        to_group_ids = self._tran_list(to_group_ids)
         param_dict = locals().copy()
         url = '/statusmessage/group/publish.json'
         # format_str = 'fromUserId={{ from_user_id }}' \
