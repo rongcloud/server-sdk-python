@@ -292,7 +292,7 @@ class Group(Module):
         """
         发送群组消息，以一个用户身份向群组发送消息，单条消息最大 128k。
         :param from_user_id:        发送人用户 Id 。（必传）
-        :param to_group_id:         接收群 Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
+        :param to_group_id:         接收群 Id。（必传）
         :param object_name:         消息类型，参考融云消息类型表.消息标志；
                                     可自定义消息类型，长度不超过 32 个字符，您在自定义消息时需要注意，不要以 "RC:" 开头，
                                     以避免与融云系统内置消息的 ObjectName 重名。（必传）
@@ -382,10 +382,10 @@ class Group(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def send_status_message(self, from_user_id, to_group_id, object_name, content, verify_blacklist=0, is_include_sender=0):
+    def send_status_message(self, from_user_id, to_group_ids, object_name, content, verify_blacklist=0, is_include_sender=0):
         '''
         发送群聊状态消息
-                :param from_user_id:            发送人用户 Id。（必传）
+        :param from_user_id:            发送人用户 Id。（必传）
         :param to_group_id:             接收群Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
         :param object_name:             消息类型，可自定义消息类型，长度不超过 32 个字符，在自定义消息时需要注意，
                                         不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。（必传）
@@ -397,15 +397,25 @@ class Group(Module):
         content = urllib.parse.quote(json.dumps(content))
         param_dict = locals().copy()
         url = '/statusmessage/group/publish.json'
+        # format_str = 'fromUserId={{ from_user_id }}' \
+        #              '&toGroupId={{ to_group_id }}' \
+        #              '&objectName={{ object_name }}' \
+        #              '&content={{ content }}' \
+        #              '{% if verify_blacklist != 0 %}&verifyBlacklist={{ verify_blacklist }}{% endif %}' \
+        #              '{% if is_include_sender != 0 %}&isIncludeSender={{ is_include_sender }}{% endif %}'
+
         format_str = 'fromUserId={{ from_user_id }}' \
-                     '&toGroupId={{ to_group_id }}' \
+                     'toGroupId={{ to_group_id }}' \
+                     '{% for item in to_group_ids %}&toGroupId={{ item }}{% endfor %}' \
                      '&objectName={{ object_name }}' \
                      '&content={{ content }}' \
                      '{% if verify_blacklist != 0 %}&verifyBlacklist={{ verify_blacklist }}{% endif %}' \
                      '{% if is_include_sender != 0 %}&isIncludeSender={{ is_include_sender }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
-            self._check_param(to_group_id, str, '1~64')
+            self._check_param(to_group_ids, list, '1~1000')
+            for group in to_group_ids:
+                self._check_param(group, str, '1~64')
             self._check_param(object_name, str, '1~32')
             self._check_param(content, str)
             self._check_param(verify_blacklist, int, '0~1')
