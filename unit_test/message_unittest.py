@@ -127,6 +127,22 @@ class MessageTestCase(unittest.TestCase):
         rep = rc.get_message().get_history().remove(date)
         self.assertEqual(rep['code'], 200, rep)
 
+    def test_private_send_status_message(self):
+        from_user_id = 'fromuser'
+        to_user_ids = ['21', '22']
+        object_name = 'RC:TxtMsg'
+        content = {"content":"hello","extra":"helloExtra"}
+        rep = rc.get_message().get_private().send_status_message(from_user_id, to_user_ids, object_name, content)
+        self.assertEqual(rep['code'], 200, rep)
+
+    def test_group_send_status_message(self):
+        from_user_id = 'fromuser'
+        to_group_id = 'Group_1'
+        object_name = 'RC:TxtMsg'
+        content = {"content":"hello","extra":"helloExtra"}
+        rep = rc.get_message().get_group().send_status_message(from_user_id, to_group_id, object_name, content)
+        self.assertEqual(rep['code'], 200, rep)
+
 
 if __name__ == '__main__':
     unittest.main()

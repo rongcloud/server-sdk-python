@@ -243,6 +243,45 @@ class Private(Module):
         except ParamException as e:
             return json.loads(str(e))
 
+    def send_status_message(self, from_user_id, to_user_ids, object_name, content, verify_blacklist=0, is_include_sender=0):
+        '''
+        发送单聊状态消息
+        :param from_user_id:            发送人用户 Id。（必传）
+        :param to_user_id:              接收用户 Id，可以实现向多人发送消息，每次上限为 1000 人。（必传）
+        :param object_name:             消息类型，可自定义消息类型，长度不超过 32 个字符，在自定义消息时需要注意，
+                                        不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param content:                 发送消息内容，单条消息最大 128k，详见消息结构示例；如果 objectName 为自定义消息类型，该参数可自定义格式。（必传）
+        :param verify_blacklist:        是否过滤发送人黑名单列表，0 表示为不过滤、 1 表示为过滤，默认为 0 不过滤。（非必传）
+        :param is_include_sender:       发送用户自己是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。（非必传）
+        :return:                        请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        '''
+
+        content = urllib.parse.quote(json.dumps(content))
+        to_user_ids = self._tran_list(to_user_ids)
+        param_dict = locals().copy()
+
+        url = '/statusmessage/private/publish.json'
+
+        format_str = 'fromUserId={{ from_user_id }}' \
+                     '{% for item in to_user_ids %}&toUserId={{ item }}{% endfor %}' \
+                     '&objectName={{ object_name }}' \
+                     '&content={{ content }}' \
+                     '{% if verify_blacklist != 0 %}&verifyBlacklist={{ verify_blacklist }}{% endif %}' \
+                     '{% if is_include_sender != 0 %}&isIncludeSender={{ is_include_sender }}{% endif %}'
+
+        try:
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_user_ids, list, '1~1000')
+            for user in to_user_ids:
+                self._check_param(user, str, '1~64')
+            self._check_param(object_name, str, '1~32')
+            self._check_param(content, str)
+            self._check_param(verify_blacklist, int, '0~1')
+            self._check_param(is_include_sender, int, '0~1')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.load(str(e))
+
 
 class Group(Module):
     def __init__(self, rc):
@@ -342,6 +381,38 @@ class Group(Module):
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
+
+    def send_status_message(self, from_user_id, to_group_id, object_name, content, verify_blacklist=0, is_include_sender=0):
+        '''
+        发送群聊状态消息
+                :param from_user_id:            发送人用户 Id。（必传）
+        :param to_group_id:             接收群Id，提供多个本参数可以实现向多群发送消息，最多不超过 3 个群组。（必传）
+        :param object_name:             消息类型，可自定义消息类型，长度不超过 32 个字符，在自定义消息时需要注意，
+                                        不要以 "RC:" 开头，以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param content:                 发送消息内容，单条消息最大 128k，详见消息结构示例；如果 objectName 为自定义消息类型，该参数可自定义格式。（必传）
+        :param verify_blacklist:        是否过滤发送人黑名单列表，0 表示为不过滤、 1 表示为过滤，默认为 0 不过滤。（非必传）
+        :param is_include_sender:       发送用户自己是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收。（非必传）
+        :return:                        请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        '''
+        content = urllib.parse.quote(json.dumps(content))
+        param_dict = locals().copy()
+        url = '/statusmessage/group/publish.json'
+        format_str = 'fromUserId={{ from_user_id }}' \
+                     '&toGroupId={{ to_group_id }}' \
+                     '&objectName={{ object_name }}' \
+                     '&content={{ content }}' \
+                     '{% if verify_blacklist != 0 %}&verifyBlacklist={{ verify_blacklist }}{% endif %}' \
+                     '{% if is_include_sender != 0 %}&isIncludeSender={{ is_include_sender }}{% endif %}'
+        try:
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_group_id, str, '1~64')
+            self._check_param(object_name, str, '1~32')
+            self._check_param(content, str)
+            self._check_param(verify_blacklist, int, '0~1')
+            self._check_param(is_include_sender, int, '0~1')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.load(str(e))
 
 
 class Chatroom(Module):
