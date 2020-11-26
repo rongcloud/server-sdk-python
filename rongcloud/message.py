@@ -280,7 +280,7 @@ class Private(Module):
             self._check_param(is_include_sender, int, '0~1')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
-            return json.load(str(e))
+            return json.dumps(e.info)
 
 
 class Group(Module):
@@ -423,7 +423,7 @@ class Group(Module):
             self._check_param(is_include_sender, int, '0~1')
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
-            return json.load(str(e))
+            return json.dumps(e.info)
 
 
 class Chatroom(Module):
