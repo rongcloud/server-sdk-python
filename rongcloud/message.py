@@ -346,6 +346,71 @@ class Group(Module):
         except ParamException as e:
             return json.loads(str(e))
 
+    def send_direction(self, from_user_id, to_group_id, to_user_ids, object_name, content, push_content=None, push_data=None,
+             is_persisted=1, is_include_sender=0, is_mentioned=0, content_available=0):
+        """
+        发送群组定向消息
+        :param from_user_id:        发送人用户 Id 。（必传）
+        :param to_group_id:         接收群 Id。（必传）
+        :param to_user_ids:         群定向消息功能，向群中指定的一个或多个用户发送消息，群中其他用户无法收到该消息，当 toGroupId 为一个群组时此参数有效。（必传）
+                                    注：如果开通了单群聊消息云存储功能，群定向消息不会存储到云端，向群中部分用户发送消息阅读状态回执时可使用此功能。
+        :param object_name:         消息类型，参考融云消息类型表.消息标志；
+                                    可自定义消息类型，长度不超过 32 个字符，您在自定义消息时需要注意，不要以 "RC:" 开头，
+                                    以避免与融云系统内置消息的 ObjectName 重名。（必传）
+        :param content:             发送消息内容，内置消息以 JSON 方式进行数据序列化，详见融云内置消息结构详解；
+                                    如果 objectName 为自定义消息类型，该参数可自定义格式，不限于 JSON。（必传）
+        :param push_content:        定义显示的 Push 内容，如果 objectName 为融云内置消息类型时，
+                                    则发送后用户一定会收到 Push 信息。如果为自定义消息，
+                                    则 pushContent 为自定义消息显示的 Push 内容，如果不传则用户不会收到 Push 通知。（非必传）
+        :param push_data:           针对 iOS 平台为 Push 通知时附加到 payload 中，客户端获取远程推送内容时为 appData 查看详细，
+                                    Android 客户端收到推送消息时对应字段名为 pushData。（非必传）
+        :param is_persisted:        针对融云服务端是否存储此条消息，客户端则根据消息注册的 ISPERSISTED 标识判断是否存储，
+                                    如果旧版客户端上未注册该消息时，收到该消息后默认为存储，但无法解析显示。
+                                    0 表示为不存储、 1 表示为存储，默认为 1 存储消息。（非必传）
+        :param is_include_sender:   发送用户自己是否接收消息，0 表示为不接收，1 表示为接收，默认为 0 不接收，
+                                    只有在 toGroupId 为一个群组 Id 的时候有效。（非必传）
+        :param is_mentioned:        是否为 @ 消息，0 表示为普通消息，1 表示为 @ 消息，默认为 0。
+                                    当为 1 时 content 参数中必须携带 mentionedInfo @消息的详细内容。
+                                    为 0 时则不需要携带 mentionedInfo。（非必传）
+                                    当指定了 toUserId 时，则 @ 的用户必须为 toUserId 中的用户。
+        :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
+                                    允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
+                                    1 表示为开启，0 表示为关闭，默认为 0（非必传）
+        :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
+        :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
+        """
+        to_user_ids = self._tran_list(to_user_ids)
+        content = urllib.parse.quote(json.dumps(content))
+        param_dict = locals().copy()
+        url = '/message/group/publish.json'
+        format_str = 'fromUserId={{ from_user_id }}' \
+                     '&toGroupId={{ to_group_id }}' \
+                     '{% for item in to_user_ids %}&toUserId={{ item }}{% endfor %}' \
+                     '&objectName={{ object_name }}' \
+                     '&content={{ content }}' \
+                     '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
+                     '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
+                     '{% if (is_persisted != 1) %}&isPersisted={{ is_persisted }}{% endif %}' \
+                     '{% if (is_include_sender != 0) %}&isIncludeSender={{ is_include_sender }}{% endif %}' \
+                     '{% if (is_mentioned != 0) %}&isMentioned={{ is_mentioned }}{% endif %}' \
+                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}'
+        try:
+            self._check_param(from_user_id, str, '1~64')
+            self._check_param(to_group_id, str, '1~64')
+            for user in to_user_ids:
+                self._check_param(user, str, '1~64')
+            self._check_param(object_name, str, '1~32')
+            self._check_param(content, str)
+            self._check_param(push_content, str)
+            self._check_param(push_data, str)
+            self._check_param(is_persisted, int, '0~1')
+            self._check_param(is_include_sender, int, '0~1')
+            self._check_param(is_mentioned, int, '0~1')
+            self._check_param(content_available, int, '0~1')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
     def recall(self, from_user_id, group_id, uid, sent_time, is_admin=None, is_delete=None, extra=None):
         """
         撤回已发送的群聊消息，撤回时间无限制，只允许撤回用户自己发送的消息。

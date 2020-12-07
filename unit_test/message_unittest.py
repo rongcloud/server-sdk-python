@@ -57,6 +57,22 @@ class MessageTestCase(unittest.TestCase):
         rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content)
         self.assertEqual(rep['code'], 200, rep)
 
+    def test_group_send(self):
+        from_user_id = 'AAA'
+        to_group_id = 'Group_1'
+        to_user_ids = ['21', '22']
+        object_name = 'RC:TxtMsg'
+        content = {
+            'content': 'hello',
+            'mentionedInfo': {
+                'type': 2,
+                'userIdList': ['123', '456'],
+                'mentionedContent': '有人@你'
+            }
+        }
+        rep = rc.get_message().get_group().send_direction(from_user_id, to_group_id, to_user_ids, object_name, content)
+        self.assertEqual(rep['code'], 200, rep)
+
     def test_group_recall(self):
         from_user_id = 'AAA'
         to_group_id = 'Group_1'
