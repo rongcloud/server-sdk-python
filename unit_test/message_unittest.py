@@ -57,7 +57,7 @@ class MessageTestCase(unittest.TestCase):
         rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content)
         self.assertEqual(rep['code'], 200, rep)
 
-    def test_group_send(self):
+    def test_group_send_direction(self):
         from_user_id = 'AAA'
         to_group_id = 'Group_1'
         to_user_ids = ['21', '22']
