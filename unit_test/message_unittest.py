@@ -11,7 +11,11 @@ class MessageTestCase(unittest.TestCase):
         from_user_id = 'AAA'
         object_name = 'RC:TxtMsg'
         content = {'content': 'hello', 'extra': 'helloExtra'}
-        rep = rc.get_message().broadcast(from_user_id, object_name, content)
+        disable_push = True
+        push_ext = "{\"title\":\"youhaveanewmessage.\",\"forceShowPushContent\":0,\"pushConfigs\":[{\"HW\":{\"channelId\":\"hw-123\"}},{\"MI\":{\"channelId\":\"mi-123\"}},{\"OPPO\":{\"channelId\":\"oppo-123\"}},{\"VIVO\":{\"classification\":\"0\"}},{\"APNs\":{\"thread-id\":\"123\",\"apns-collapse-id\":\"123456\"}}]}"
+        # rep = rc.get_message().broadcast(from_user_id, object_name, content)
+        # rep = rc.get_message().broadcast(from_user_id, object_name, content, disable_push=disable_push)
+        rep = rc.get_message().broadcast(from_user_id, object_name, content, disable_push=disable_push, push_ext=push_ext)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_private_send(self):
@@ -19,7 +23,12 @@ class MessageTestCase(unittest.TestCase):
         to_user_id = 'AAA'
         object_name = 'RC:TxtMsg'
         content = {'content': 'hello', 'extra': '...'}
-        rep = rc.get_message().get_private().send(from_user_id, to_user_id, object_name, content)
+        expansion = True
+        disable_push = True
+        push_ext = "{\"title\":\"youhaveanewmessage.\",\"forceShowPushContent\":0,\"pushConfigs\":[{\"HW\":{\"channelId\":\"hw-123\"}},{\"MI\":{\"channelId\":\"mi-123\"}},{\"OPPO\":{\"channelId\":\"oppo-123\"}},{\"VIVO\":{\"classification\":\"0\"}},{\"APNs\":{\"thread-id\":\"123\",\"apns-collapse-id\":\"123456\"}}]}"
+        # rep = rc.get_message().get_private().send(from_user_id, to_user_id, object_name, content)
+        # rep = rc.get_message().get_private().send(from_user_id, to_user_id, object_name, content, expansion=expansion, disable_push=disable_push)
+        rep = rc.get_message().get_private().send(from_user_id, to_user_id, object_name, content, expansion=expansion, disable_push=disable_push, push_ext=push_ext)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_private_recall(self):
@@ -27,7 +36,9 @@ class MessageTestCase(unittest.TestCase):
         target_id = 'BBB'
         uid = '5FGT-7VA9-G4DD-4V5P'
         sent_time = 1507778882124
-        rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time)
+        disable_push = True
+        # rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time)
+        rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time, disable_push=disable_push)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_private_send_template(self):
@@ -38,8 +49,11 @@ class MessageTestCase(unittest.TestCase):
         content = {'content': '{c}{d}{e}', 'extra': 'bb'}
         push_content = ['push{c}', 'push{c}']
         push_data = ['pushd', 'pushd']
+        disable_push = False
+        # rep = rc.get_message().get_private().send_template(from_user_id, to_user_ids, object_name, values, content,
+        #                                                    push_content, push_data)
         rep = rc.get_message().get_private().send_template(from_user_id, to_user_ids, object_name, values, content,
-                                                           push_content, push_data)
+                                                           push_content, push_data, disable_push=disable_push)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_group_send(self):
@@ -54,7 +68,12 @@ class MessageTestCase(unittest.TestCase):
                 'mentionedContent': '有人@你'
             }
         }
-        rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content)
+        expansion = True
+        disable_push = True
+        push_ext = "{\"title\":\"youhaveanewmessage.\",\"forceShowPushContent\":0,\"pushConfigs\":[{\"HW\":{\"channelId\":\"hw-123\"}},{\"MI\":{\"channelId\":\"mi-123\"}},{\"OPPO\":{\"channelId\":\"oppo-123\"}},{\"VIVO\":{\"classification\":\"0\"}},{\"APNs\":{\"thread-id\":\"123\",\"apns-collapse-id\":\"123456\"}}]}"
+        # rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content)
+        # rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content, expansion=expansion, disable_push=disable_push)
+        rep = rc.get_message().get_group().send(from_user_id, to_group_id, object_name, content, expansion=expansion, disable_push=disable_push, push_ext=push_ext)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_group_send_direction(self):
@@ -78,7 +97,9 @@ class MessageTestCase(unittest.TestCase):
         to_group_id = 'Group_1'
         uid = '5FGT-7VA9-G4DD-4V5P'
         sent_time = 1507778882124
-        rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time)
+        disable_push = True
+        # rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time)
+        rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time, disable_push=disable_push)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_chatroom_send(self):
@@ -118,7 +139,10 @@ class MessageTestCase(unittest.TestCase):
             'content': 'hello',
             'extra': 'helloExtra'
         }
-        rep = rc.get_message().get_system().send(from_user_id, to_user_id, object_name, content)
+        disable_push = False
+        push_ext = "{\"title\":\"youhaveanewmessage.\",\"forceShowPushContent\":0,\"pushConfigs\":[{\"HW\":{\"channelId\":\"hw-123\"}},{\"MI\":{\"channelId\":\"mi-123\"}},{\"OPPO\":{\"channelId\":\"oppo-123\"}},{\"VIVO\":{\"classification\":\"0\"}},{\"APNs\":{\"thread-id\":\"123\",\"apns-collapse-id\":\"123456\"}}]}"
+        # rep = rc.get_message().get_system().send(from_user_id, to_user_id, object_name, content)
+        rep = rc.get_message().get_system().send(from_user_id, to_user_id, object_name, content, disable_push=disable_push, push_ext=push_ext)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_system_send_template(self):

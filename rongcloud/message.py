@@ -15,7 +15,7 @@ class Message(Module):
         self._user_info = self._render(param_dict, format_str)
 
     def broadcast(self, from_user_id, object_name, content, push_content=None, push_data=None, os=None,
-                  content_available=0):
+                  content_available=0, disable_push=False, push_ext=None):
         """
         单个应用每小时只能发送 2 次，每天最多发送 3 次。如需要调整发送频率，可联系销售，电话 13161856839。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -35,6 +35,8 @@ class Message(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0。（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
+        :param push_ext             推送通知属性设置，详细查看 pushExt 结构说明，pushExt 为 JSON 结构请求时需要做转义处理。disablePush 为 true 时此属性无效。暂不支持海外数据中心（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
@@ -46,7 +48,9 @@ class Message(Module):
                      '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
                      '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
                      '{% if os is not none %}&os={{ os }}{% endif %}' \
-                     '{% if content_available != 0 %}&contentAvailable={{ content_available }}{% endif %}'
+                     '{% if content_available != 0 %}&contentAvailable={{ content_available }}{% endif %}' \
+                     '{% if disable_push != False %}&disablePush={{ disable_push }}{% endif %}' \
+                     '{% if push_ext is not none %}&pushExt={{ push_ext }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(object_name, str, '1~32')
@@ -55,6 +59,7 @@ class Message(Module):
             self._check_param(push_data, str)
             self._check_param(os, str)
             self._check_param(content_available, int, '0~1')
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -80,7 +85,7 @@ class Private(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_user_ids, object_name, content, push_content=None, push_data=None,
-             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0):
+             count=-1, verify_blacklist=0, is_persisted=1, is_include_sender=0, content_available=0, expansion=False, disable_push=False, push_ext=None):
         """
         发送单聊消息。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -108,6 +113,9 @@ class Private(Module):
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0（非必传）
         :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
+        :param expansion            是否为可扩展消息，默认为 false，设为 true 时终端在收到该条消息后，可对该条消息设置扩展信息。暂不支持海外数据中心（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
+        :param push_ext             推送通知属性设置，详细查看 pushExt 结构说明，pushExt 为 JSON 结构请求时需要做转义处理。disablePush 为 true 时此属性无效。暂不支持海外数据中心（非必传）
         :return:                    返回码，200 为正常。如：{"code":200}
         """
         to_user_ids = self._tran_list(to_user_ids)
@@ -124,7 +132,11 @@ class Private(Module):
                      '{% if verify_blacklist != 0 %}&verifyBlacklist={{ verify_blacklist }}{% endif %}' \
                      '{% if is_persisted != 1 %}&isPersisted={{ is_persisted }}{% endif %}' \
                      '{% if is_include_sender != 0 %}&isIncludeSender={{ is_include_sender }}{% endif %}' \
-                     '{% if content_available != 0 %}&contentAvailable={{ content_available }}{% endif %}'
+                     '{% if content_available != 0 %}&contentAvailable={{ content_available }}{% endif %}' \
+                     '{% if expansion != False %}&expansion={{ expansion }}{% endif %}' \
+                     '{% if disable_push != False %}&disablePush={{ disable_push }}{% endif %}' \
+                     '{% if push_ext is not none %}&pushExt={{ push_ext }}{% endif %}'
+
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_user_ids, list, '1~1000')
@@ -139,11 +151,13 @@ class Private(Module):
             self._check_param(is_persisted, int, '0~1')
             self._check_param(is_include_sender, int, '0~1')
             self._check_param(content_available, int, '0~1')
+            self._check_param(expansion, bool)
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
-    def recall(self, from_user_id, target_id, uid, sent_time, is_admin=0, is_delete=0, extra=None):
+    def recall(self, from_user_id, target_id, uid, sent_time, is_admin=0, is_delete=0, extra=None,disable_push=False):
         """
         撤回已发送的单聊消息，撤回时间无限制，只允许撤回用户自己发送的消息。
         :param from_user_id:        消息发送人用户 Id。（必传）
@@ -155,6 +169,7 @@ class Private(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
         :return:                    返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
@@ -166,7 +181,8 @@ class Private(Module):
                      '&sentTime={{ sent_time }}' \
                      '{% if is_admin is not none %}&isAdmin={{ is_admin }}{% endif %}' \
                      '{% if is_delete is not none %}&isDelete={{ is_delete }}{% endif %}' \
-                     '{% if extra is not none %}&extra={{ extra }}{% endif %}'
+                     '{% if extra is not none %}&extra={{ extra }}{% endif %}' \
+                     '{% if disable_push != False %}&disablePush={{ disable_push }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(target_id, str, '1~64')
@@ -175,12 +191,13 @@ class Private(Module):
             self._check_param(is_admin, int)
             self._check_param(is_delete, int)
             self._check_param(extra, str)
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
 
     def send_template(self, from_user_id, to_user_ids, object_name, values, content,
-                      push_content=None, push_data=None, verify_blacklist=0, content_available=0):
+                      push_content=None, push_data=None, verify_blacklist=0, content_available=0, disable_push=False):
         """
         发送单聊模板消息。一个用户向多个用户发送不同消息内容，单条消息最大 128k。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -201,6 +218,7 @@ class Private(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0。（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         if push_content is None:
@@ -225,7 +243,9 @@ class Private(Module):
                      '{% endif %}' \
                      '{% if (verify_blacklist != 0) %},"verifyBlacklist":{{ verify_blacklist }}{% endif %}' \
                      '{% if (content_available != 0) %},"contentAvailable":{{ content_available }}{% endif %}' \
+                     '{% if (disable_push != False) %},"disablePush":\"{{ disable_push }}\"{% endif %}' \
                      '}'
+
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_user_ids, list, '1~1000')
@@ -238,6 +258,7 @@ class Private(Module):
             self._check_param(push_data, list)
             self._check_param(verify_blacklist, int, '0~1')
             self._check_param(content_available, int, '0~1')
+            self._check_param(disable_push, bool)
             xx = self._render(param_dict, format_str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
@@ -288,7 +309,7 @@ class Group(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_group_id, object_name, content, push_content=None, push_data=None,
-             is_persisted=1, is_include_sender=0, is_mentioned=0, content_available=0):
+             is_persisted=1, is_include_sender=0, is_mentioned=0, content_available=0, expansion=False, disable_push=False, push_ext=None):
         """
         发送群组消息，以一个用户身份向群组发送消息，单条消息最大 128k。
         :param from_user_id:        发送人用户 Id 。（必传）
@@ -316,6 +337,10 @@ class Group(Module):
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0（非必传）
         :param attach_user_info:    是否携带用户信息，默认为 False。（非必传）
+        :param expansion            是否为可扩展消息，默认为 false，设为 true 时终端在收到该条消息后，可对该条消息设置扩展信息。暂不支持海外数据中心（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心
+        :param push_ext             推送通知属性设置，详细查看 pushExt 结构说明，pushExt 为 JSON 结构请求时需要做转义处理。
+                                    disablePush 为 true 时此属性无效。暂不支持海外数据中心（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         content = urllib.parse.quote(json.dumps(content))
@@ -330,7 +355,10 @@ class Group(Module):
                      '{% if (is_persisted != 1) %}&isPersisted={{ is_persisted }}{% endif %}' \
                      '{% if (is_include_sender != 0) %}&isIncludeSender={{ is_include_sender }}{% endif %}' \
                      '{% if (is_mentioned != 0) %}&isMentioned={{ is_mentioned }}{% endif %}' \
-                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}'
+                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}' \
+                     '{% if (expansion != 0) %}&expansion={{ expansion }}{% endif %}' \
+                     '{% if (disable_push != 0) %}&disablePush={{ disable_push }}{% endif %}' \
+                     '{% if push_ext is not none %}&pushExt={{ push_ext }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_group_id, str, '1~64')
@@ -342,6 +370,8 @@ class Group(Module):
             self._check_param(is_include_sender, int, '0~1')
             self._check_param(is_mentioned, int, '0~1')
             self._check_param(content_available, int, '0~1')
+            self._check_param(expansion, bool)
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -411,7 +441,7 @@ class Group(Module):
         except ParamException as e:
             return json.loads(str(e))
 
-    def recall(self, from_user_id, group_id, uid, sent_time, is_admin=None, is_delete=None, extra=None):
+    def recall(self, from_user_id, group_id, uid, sent_time, is_admin=None, is_delete=None, extra=None,disable_push=False):
         """
         撤回已发送的群聊消息，撤回时间无限制，只允许撤回用户自己发送的消息。
         :param from_user_id:        消息发送人用户 Id。（必传）
@@ -423,6 +453,7 @@ class Group(Module):
         :param is_delete:           是否删除消息，默认为 0 撤回该条消息同时，用户端将该条消息删除并替换为一条小灰条撤回提示消息；
                                     为 1 时，该条消息删除后，不替换为小灰条提示消息。（非必传）
         :param extra:               扩展信息，可以放置任意的数据内容。（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         param_dict = locals().copy()
@@ -434,7 +465,8 @@ class Group(Module):
                      '&sentTime={{ sent_time }}' \
                      '{% if is_admin is not none %}&isAdmin={{ is_admin }}{% endif %}' \
                      '{% if is_delete is not none %}&isDelete={{ is_delete }}{% endif %}' \
-                     '{% if extra is not none %}&extra={{ extra }}{% endif %}'
+                     '{% if extra is not none %}&extra={{ extra }}{% endif %}' \
+                     '{% if disable_push != False %}&disablePush={{ disable_push }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(group_id, str, '1~64')
@@ -443,6 +475,7 @@ class Group(Module):
             self._check_param(is_admin, int)
             self._check_param(is_delete, int)
             self._check_param(extra, str)
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -591,7 +624,7 @@ class System(Module):
         super().__init__(rc)
 
     def send(self, from_user_id, to_user_ids, object_name, content, push_content=None, push_data=None,
-             is_persisted=1, content_available=0):
+             is_persisted=1, content_available=0, disable_push=False, push_ext=None):
         """
         发送系统消息，一个用户向一个或多个用户发送系统消息，单条消息最大 128k，会话类型为 SYSTEM。
         :param from_user_id:        发送人用户 Id。（必传）
@@ -612,6 +645,8 @@ class System(Module):
         :param content_available:   针对 iOS 平台，对 SDK 处于后台暂停状态时为静默推送，是 iOS7 之后推出的一种推送方式。
                                     允许应用在收到通知后在后台运行一段代码，且能够马上执行，查看详细。
                                     1 表示为开启，0 表示为关闭，默认为 0。（非必传）
+        :param disable_push         是否为静默消息，默认为 false，设为 true 时终端用户离线情况下不会收到通知提醒。暂不支持海外数据中心（非必传）
+        :param push_ext             推送通知属性设置，详细查看 pushExt 结构说明，pushExt 为 JSON 结构请求时需要做转义处理。disablePush 为 true 时此属性无效。暂不支持海外数据中心（非必传）
         :return:                    请求返回结果，code 返回码，200 为正常。如：{"code":200}
         """
         to_user_ids = self._tran_list(to_user_ids)
@@ -625,7 +660,9 @@ class System(Module):
                      '{% if push_content is not none %}&pushContent={{ push_content }}{% endif %}' \
                      '{% if push_data is not none %}&pushData={{ push_data }}{% endif %}' \
                      '{% if (is_persisted != 1) %}&isPersisted={{ is_persisted }}{% endif %}' \
-                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}'
+                     '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}' \
+                     '{% if disable_push != False %}&disablePush={{ disable_push }}{% endif %}' \
+                     '{% if push_ext is not none %}&pushExt={{ push_ext }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
             self._check_param(to_user_ids, list, '1~100')
@@ -637,6 +674,7 @@ class System(Module):
             self._check_param(push_data, str)
             self._check_param(is_persisted, int, '0~1')
             self._check_param(content_available, int, '0~1')
+            self._check_param(disable_push, bool)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
