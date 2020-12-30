@@ -356,8 +356,8 @@ class Group(Module):
                      '{% if (is_include_sender != 0) %}&isIncludeSender={{ is_include_sender }}{% endif %}' \
                      '{% if (is_mentioned != 0) %}&isMentioned={{ is_mentioned }}{% endif %}' \
                      '{% if (content_available != 0) %}&contentAvailable={{ content_available }}{% endif %}' \
-                     '{% if (expansion != 0) %}&expansion={{ expansion }}{% endif %}' \
-                     '{% if (disable_push != 0) %}&disablePush={{ disable_push }}{% endif %}' \
+                     '{% if (expansion != False) %}&expansion={{ expansion }}{% endif %}' \
+                     '{% if (disable_push != False) %}&disablePush={{ disable_push }}{% endif %}' \
                      '{% if push_ext is not none %}&pushExt={{ push_ext }}{% endif %}'
         try:
             self._check_param(from_user_id, str, '1~64')
@@ -372,6 +372,7 @@ class Group(Module):
             self._check_param(content_available, int, '0~1')
             self._check_param(expansion, bool)
             self._check_param(disable_push, bool)
+            self._check_param(push_ext, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
@@ -675,6 +676,7 @@ class System(Module):
             self._check_param(is_persisted, int, '0~1')
             self._check_param(content_available, int, '0~1')
             self._check_param(disable_push, bool)
+            self._check_param(push_ext, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
