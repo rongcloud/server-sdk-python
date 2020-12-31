@@ -60,6 +60,7 @@ class Message(Module):
             self._check_param(os, str)
             self._check_param(content_available, int, '0~1')
             self._check_param(disable_push, bool)
+            self._check_param(push_ext, str)
             return self._http_post(url, self._render(param_dict, format_str))
         except ParamException as e:
             return json.loads(str(e))
