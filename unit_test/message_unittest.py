@@ -11,11 +11,9 @@ class MessageTestCase(unittest.TestCase):
         from_user_id = 'AAA'
         object_name = 'RC:TxtMsg'
         content = {'content': 'hello', 'extra': 'helloExtra'}
-        disable_push = True
         push_ext = "{\"title\":\"youhaveanewmessage.\",\"forceShowPushContent\":0,\"pushConfigs\":[{\"HW\":{\"channelId\":\"hw-123\"}},{\"MI\":{\"channelId\":\"mi-123\"}},{\"OPPO\":{\"channelId\":\"oppo-123\"}},{\"VIVO\":{\"classification\":\"0\"}},{\"APNs\":{\"thread-id\":\"123\",\"apns-collapse-id\":\"123456\"}}]}"
-        # rep = rc.get_message().broadcast(from_user_id, object_name, content)
-        # rep = rc.get_message().broadcast(from_user_id, object_name, content, disable_push=disable_push)
-        rep = rc.get_message().broadcast(from_user_id, object_name, content, disable_push=disable_push, push_ext=push_ext)
+        rep = rc.get_message().broadcast(from_user_id, object_name, content)
+        # rep = rc.get_message().broadcast(from_user_id, object_name, content, push_ext=push_ext)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_private_send(self):
@@ -36,9 +34,7 @@ class MessageTestCase(unittest.TestCase):
         target_id = 'BBB'
         uid = '5FGT-7VA9-G4DD-4V5P'
         sent_time = 1507778882124
-        disable_push = True
-        # rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time)
-        rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time, disable_push=disable_push)
+        rep = rc.get_message().get_private().recall(from_user_id, target_id, uid, sent_time)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_private_send_template(self):
@@ -97,9 +93,7 @@ class MessageTestCase(unittest.TestCase):
         to_group_id = 'Group_1'
         uid = '5FGT-7VA9-G4DD-4V5P'
         sent_time = 1507778882124
-        disable_push = True
-        # rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time)
-        rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time, disable_push=disable_push)
+        rep = rc.get_message().get_group().recall(from_user_id, to_group_id, uid, sent_time)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_chatroom_send(self):
