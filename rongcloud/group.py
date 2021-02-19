@@ -161,6 +161,21 @@ class Group(Module):
     def get_user(self):
         return User(self._rc)
 
+    def query_user_group(self, user_id):
+        '''
+        查询用户所在群组
+        :param user_id   用户 Id（必传）
+        :return:
+        '''
+        param_dict = locals().copy()
+        url = '/user/group/query.json'
+        format_str = 'userId={{ user_id }}'
+        try:
+            self._check_param(user_id, str, '1~64')
+            return self._http_post(url, self._render(param_dict, format_str))
+        except ParamException as e:
+            return json.loads(str(e))
+
 
 class User(Module):
     def __init__(self, rc):

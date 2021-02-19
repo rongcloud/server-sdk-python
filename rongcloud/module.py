@@ -39,7 +39,7 @@ class Module:
                 HEADER_NONCE: nonce,
                 HEADER_TIMESTAMP: timestamp,
                 HEADER_SIGNATURE: signature,
-                HEADER_USER_AGENT: 'rc-python-sdk/3.1.1'}
+                HEADER_USER_AGENT: 'rc-python-sdk/3.2.0'}
 
     def _http_post(self, url, data=''):
         data = '{}'.encode('utf-8') if data is None else data.encode('utf-8')

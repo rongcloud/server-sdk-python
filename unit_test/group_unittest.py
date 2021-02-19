@@ -149,6 +149,11 @@ class GroupTestCase(unittest.TestCase):
         rep = rc.get_group().get_user().get_ban().get_whitelist().query(group_id)
         self.assertEqual(rep['code'], 200, rep)
 
+    def test_query_user_group(self):
+        user_id = 'AAA'
+        rep = rc.get_group().query_user_group(user_id)
+        self.assertEqual(rep['code'], 200, rep)
+
 
 if __name__ == '__main__':
     unittest.main()
