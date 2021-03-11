@@ -10,7 +10,8 @@ class UserTestCase(unittest.TestCase):
         user_id = 'AAA'
         user_name = '忘情水'
         portrait = 'https://www.baidu.com/img/bd_logo1.png?where=super'
-        rep = rc.get_user().register(user_id, user_name, portrait)
+        # rep = rc.get_user().register(user_id, user_name, portrait)
+        rep = rc.get_user().register(user_id, user_name)
         self.assertEqual(rep['code'], 200, rep)
 
     def test_update(self):

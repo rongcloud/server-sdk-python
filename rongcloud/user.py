@@ -32,7 +32,7 @@ class User(Module):
         url = '/user/getToken.json'
         format_str = 'userId={{ user_id }}' \
                      '&name={{ name }}' \
-                     '&portraitUri={{ portrait_uri }}'
+                     '{% if portrait_uri is not none %}&portraitUri={{ portrait_uri }}{% endif %}'
         try:
             self._check_param(user_id, str, '1~64')
             self._check_param(name, str, '0~128')
